@@ -4,15 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plasticology Ultimate Edition</title>
-    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts for a clean look -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js for activity graph -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Custom styles */
@@ -38,13 +34,9 @@
         .action-btn {
             transition: all 0.2s ease-in-out;
         }
-        .action-btn:hover:not(:disabled) {
+        .action-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        .action-btn:disabled {
-            cursor: not-allowed;
-            opacity: 0.7;
         }
         .main-menu-btn {
             transition: all 0.3s ease-in-out;
@@ -120,9 +112,7 @@
 </head>
 <body class="flex items-center justify-center min-h-screen p-2 sm:p-4">
 
-    <!-- Main container for the entire app -->
     <div class="main-app-container">
-        <!-- Global header with fixed title and home button -->
         <header id="global-header" class="p-4 md:p-6 bg-slate-800 text-white flex justify-between items-center hidden">
             <a href="https://www.surgerymastersacademy.com" target="_blank" title="Back to Main Website">
                 <img id="header-logo" src="https://raw.githubusercontent.com/doctorbishoy/Plasticology-/main/Plasticology%202025%20Logo%20white%20outline.png" alt="Logo" class="h-10">
@@ -135,19 +125,17 @@
                 <button id="activity-log-btn" class="text-white hover:text-slate-300 transition-colors text-2xl" title="Activity Log" aria-label="Activity Log">
                     <i class="fas fa-history"></i>
                 </button>
-                 <a href="https://t.me/DrBishoyAcademy" target="_blank" class="text-white hover:text-slate-300 transition-colors text-2xl" title="Contact Support"><i class="fas fa-headset"></i></a>
+                <a href="https://t.me/DrBishoyAcademy" target="_blank" class="text-white hover:text-slate-300 transition-colors text-2xl" title="Contact Support"><i class="fas fa-headset"></i></a>
                 <button id="global-home-btn" class="text-white hover:text-slate-300 transition-colors text-2xl" title="Back to Home" aria-label="Back to Home">
                     <i class="fas fa-home"></i>
                 </button>
-                 <button id="logout-btn" class="text-white hover:text-red-500 transition-colors text-2xl hidden" title="Logout" aria-label="Logout">
+                <button id="logout-btn" class="text-white hover:text-red-500 transition-colors text-2xl hidden" title="Logout" aria-label="Logout">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>
         </header>
 
-        <!-- Main content area where screens are swapped -->
         <main id="main-content">
-            <!-- Login Screen -->
             <div id="login-container" class="w-full max-w-md mx-auto">
                 <div class="p-8">
                     <a href="https://www.surgerymastersacademy.com" target="_blank" title="Go to Main Website">
@@ -157,42 +145,40 @@
                     <p class="text-slate-600 font-semibold text-center mt-4">Together We Can</p>
                     <p class="text-slate-500 text-center mt-2 mb-6">Please log in to continue.</p>
                     <div id="login-loader" class="loader hidden"></div>
-                    <p id="login-loading-text" class="text-center text-slate-500 hidden">Checking credentials...</p>
-                    <form id="login-form"> <!-- Removed hidden class to show by default -->
-                         <div class="mb-4">
-                             <label for="username" class="block text-slate-700 text-sm font-bold mb-2">Username</label>
-                             <input type="text" id="username" class="shadow appearance-none border rounded w-full py-2 px-3 text-slate-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                         </div>
-                         <div class="mb-6">
-                             <label for="password" class="block text-slate-700 text-sm font-bold mb-2">Password</label>
-                             <input type="password" id="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-slate-700 mb-3 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                         </div>
-                         <p id="login-error" class="text-red-500 text-xs italic mb-4 hidden"></p>
-                         <div class="flex flex-col gap-4">
-                             <button type="submit" class="action-btn w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline">
-                                 Log In
-                             </button>
-                             <div class="relative flex py-2 items-center">
-                                 <div class="flex-grow border-t border-gray-300"></div>
-                                 <span class="flex-shrink mx-4 text-gray-400 text-sm">OR</span>
-                                 <div class="flex-grow border-t border-gray-300"></div>
-                             </div>
-                             <!-- Button is disabled until free test data is loaded -->
-                             <button type="button" id="free-test-btn" class="action-btn w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline" disabled>
-                                 <i class="fas fa-spinner fa-spin mr-2"></i> Loading Free Test...
-                             </button>
-                             <a href="https://www.youtube.com/playlist?list=PLVUDV5bqFz4jabLMYet03YmJknm8jA-wG" target="_blank" class="action-btn text-center w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline">
-                                 <i class="fab fa-youtube mr-2"></i> Watch Sample Lectures
-                             </a>
-                              <a href="https://t.me/DrBishoyAcademy" target="_blank" class="action-btn text-center w-full mt-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline">
-                                 <i class="fab fa-telegram-plane mr-2"></i> Subscribe now for Ultimate Edition
-                             </a>
-                         </div>
+                    <p id="login-loading-text" class="text-center text-slate-500 hidden">Loading data...</p>
+                    <form id="login-form" class="hidden">
+                        <div class="mb-4">
+                            <label for="username" class="block text-slate-700 text-sm font-bold mb-2">Username</label>
+                            <input type="text" id="username" class="shadow appearance-none border rounded w-full py-2 px-3 text-slate-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="mb-6">
+                            <label for="password" class="block text-slate-700 text-sm font-bold mb-2">Password</label>
+                            <input type="password" id="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-slate-700 mb-3 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <p id="login-error" class="text-red-500 text-xs italic mb-4 hidden">Invalid username or password.</p>
+                        <div class="flex flex-col gap-4">
+                            <button type="submit" class="action-btn w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline">
+                                Log In
+                            </button>
+                            <div class="relative flex py-2 items-center">
+                                <div class="flex-grow border-t border-gray-300"></div>
+                                <span class="flex-shrink mx-4 text-gray-400 text-sm">OR</span>
+                                <div class="flex-grow border-t border-gray-300"></div>
+                            </div>
+                            <button type="button" id="free-test-btn" class="action-btn w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline">
+                                <i class="fas fa-vial mr-2"></i> Try a Free Test
+                            </button>
+                            <a href="https://www.youtube.com/playlist?list=PLVUDV5bqFz4jabLMYet03YmJknm8jA-wG" target="_blank" class="action-btn text-center w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline">
+                                <i class="fab fa-youtube mr-2"></i> Watch Sample Lectures
+                            </a>
+                            <a href="https://t.me/DrBishoyAcademy" target="_blank" class="action-btn text-center w-full mt-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline">
+                                <i class="fab fa-telegram-plane mr-2"></i> Subscribe now for Ultimate Edition
+                            </a>
+                        </div>
                     </form>
                 </div>
             </div>
             
-            <!-- Main Menu Screen -->
             <div id="main-menu-container" class="w-full hidden">
                 <div class="p-6 md:p-8">
                     <h2 class="text-3xl font-bold text-slate-800 text-center mb-2">Welcome to Plasticology!</h2>
@@ -216,13 +202,11 @@
                 </div>
             </div>
 
-            <!-- Lectures Screen -->
             <div id="lectures-container" class="w-full hidden">
                 <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
                     <button id="lectures-back-btn" class="text-slate-700 hover:text-blue-600 transition-colors" title="Back"><i class="fas fa-arrow-left"></i> Back</button>
                     <h2 class="text-xl md:text-2xl font-bold text-slate-800">Lectures</h2>
-                    <div class="w-16"></div> <!-- Spacer -->
-                </div>
+                    <div class="w-16"></div> </div>
                 <div class="p-4 md:p-6">
                     <div class="relative mb-6">
                         <input type="text" id="lecture-search-input" placeholder="Search by chapter or topic..." class="w-full p-3 pl-10 border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
@@ -230,20 +214,16 @@
                     </div>
                     <div id="lectures-loader" class="loader"></div>
                     <div id="lectures-list" class="space-y-4">
-                        <!-- Lecture accordions will be injected here -->
-                    </div>
+                        </div>
                 </div>
             </div>
 
-            <!-- Question Bank Home Screen -->
             <div id="qbank-container" class="w-full hidden">
-                 <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
+                <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
                     <button id="qbank-back-btn" class="text-slate-700 hover:text-blue-600 transition-colors" title="Back"><i class="fas fa-arrow-left"></i> Back</button>
                     <h2 class="text-xl md:text-2xl font-bold text-slate-800">Question Bank</h2>
-                    <div class="w-16"></div> <!-- Spacer -->
-                </div>
+                    <div class="w-16"></div> </div>
                 <div id="qbank-controls">
-                    <!-- Mock Exam Section -->
                     <div class="p-6 md:p-8 border-b border-slate-200">
                         <div id="loader" class="loader hidden"></div>
                         <p id="loading-text" class="text-slate-500 mt-2 text-center hidden">Loading questions...</p>
@@ -256,27 +236,26 @@
                             </button>
                         </div>
                         <div id="custom-exam-options" class="custom-exam-options mt-4">
-                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                 <div>
-                                     <label for="chapter-select-mock" class="block text-sm font-medium text-slate-700 mb-2">Filter by Chapters (optional)</label>
-                                     <div id="chapter-select-mock" class="filter-container space-y-2">
-                                         <p class="text-slate-400">Loading chapters...</p>
-                                     </div>
-                                 </div>
-                                 <div>
-                                     <label for="source-select-mock" class="block text-sm font-medium text-slate-700 mb-2">Filter by Sources (optional)</label>
-                                     <div id="source-select-mock" class="filter-container space-y-2">
-                                         <p class="text-slate-400">Loading sources...</p>
-                                     </div>
-                                 </div>
-                             </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="chapter-select-mock" class="block text-sm font-medium text-slate-700 mb-2">Filter by Chapters (optional)</label>
+                                    <div id="chapter-select-mock" class="filter-container space-y-2">
+                                        <p class="text-slate-400">Loading chapters...</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="source-select-mock" class="block text-sm font-medium text-slate-700 mb-2">Filter by Sources (optional)</label>
+                                    <div id="source-select-mock" class="filter-container space-y-2">
+                                        <p class="text-slate-400">Loading sources...</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <button id="start-mock-btn" class="action-btn w-full mt-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-lg">
                             Start Mock Exam
                         </button>
                         <p id="mock-error" class="text-red-500 text-xs italic mt-2 hidden"></p>
                     </div>
-                    <!-- Browse Section -->
                     <div class="p-6 md:p-8">
                         <h3 class="text-xl font-bold text-slate-800 mb-4">Browse Questions</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -287,41 +266,34 @@
                 </div>
             </div>
             
-            <!-- List Screen (for Chapters or Sources) -->
             <div id="list-container" class="w-full hidden">
-                 <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
+                <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
                     <button id="list-back-btn" class="text-slate-700 hover:text-blue-600 transition-colors" title="Back"><i class="fas fa-arrow-left"></i> Back</button>
                     <h2 id="list-title" class="text-xl md:text-2xl font-bold text-slate-800"></h2>
-                    <div class="w-16"></div> <!-- Spacer -->
-                </div>
+                    <div class="w-16"></div> </div>
                 <div id="list-items" class="p-4 md:p-6 grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4"></div>
             </div>
 
-            <!-- My Notes Screen -->
             <div id="notes-container" class="w-full hidden">
                 <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
                     <button id="notes-back-btn" class="text-slate-700 hover:text-blue-600 transition-colors" title="Back"><i class="fas fa-arrow-left"></i> Back</button>
                     <h2 class="text-xl md:text-2xl font-bold text-slate-800">My Notes</h2>
-                    <div class="w-16"></div> <!-- Spacer -->
-                </div>
+                    <div class="w-16"></div> </div>
                 <div class="p-6 md:p-8">
                     <div class="mb-4 p-1 bg-slate-200 rounded-lg flex justify-center gap-1">
                         <button id="notes-filter-quizzes" class="filter-btn flex-1 py-2 px-4 rounded-md text-sm font-semibold transition-colors">Quiz Notes</button>
                         <button id="notes-filter-lectures" class="filter-btn flex-1 py-2 px-4 rounded-md text-sm font-semibold transition-colors">Lecture Notes</button>
                     </div>
                     <div id="notes-list" class="space-y-3 max-h-[70vh] overflow-y-auto">
-                        <!-- Notes will be injected here -->
-                    </div>
+                        </div>
                 </div>
             </div>
 
-            <!-- Activity Log Screen -->
             <div id="activity-log-container" class="w-full hidden">
                 <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
                     <button id="activity-back-btn" class="text-slate-700 hover:text-blue-600 transition-colors" title="Back"><i class="fas fa-arrow-left"></i> Back</button>
                     <h2 class="text-xl md:text-2xl font-bold text-slate-800">Activity Log</h2>
-                    <div class="w-16"></div> <!-- Spacer -->
-                </div>
+                    <div class="w-16"></div> </div>
                 <div class="p-6 md:p-8">
                     <div class="mb-4 p-1 bg-slate-200 rounded-lg flex justify-center gap-1">
                         <button id="log-filter-all" class="filter-btn flex-1 py-2 px-4 rounded-md text-sm font-semibold transition-colors">All</button>
@@ -329,19 +301,17 @@
                         <button id="log-filter-lectures" class="filter-btn flex-1 py-2 px-4 rounded-md text-sm font-semibold transition-colors">Lectures</button>
                     </div>
                     
-                    <!-- Summary Cards for "All" -->
                     <div id="all-summary" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 hidden">
-                         <div class="bg-teal-100 p-4 rounded-lg text-center">
-                             <p class="text-sm text-teal-800 font-semibold">Lectures Progress</p>
-                             <p id="all-lectures-progress" class="text-2xl font-bold text-teal-900"></p>
-                         </div>
+                        <div class="bg-teal-100 p-4 rounded-lg text-center">
+                            <p class="text-sm text-teal-800 font-semibold">Lectures Progress</p>
+                            <p id="all-lectures-progress" class="text-2xl font-bold text-teal-900"></p>
+                        </div>
                         <div class="bg-sky-100 p-4 rounded-lg text-center">
-                             <p class="text-sm text-sky-800 font-semibold">Questions Progress</p>
-                             <p id="all-questions-progress" class="text-2xl font-bold text-sky-900"></p>
-                         </div>
+                            <p class="text-sm text-sky-800 font-semibold">Questions Progress</p>
+                            <p id="all-questions-progress" class="text-2xl font-bold text-sky-900"></p>
+                        </div>
                     </div>
 
-                    <!-- Summary Cards for "Quizzes" -->
                     <div id="quiz-summary" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 hidden">
                         <div class="bg-green-100 p-4 rounded-lg text-center">
                             <p class="text-sm text-green-800 font-semibold">Total Correct Answers</p>
@@ -357,32 +327,28 @@
                         </div>
                     </div>
 
-                     <!-- Summary Cards for "Lectures" -->
                     <div id="lecture-summary" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 hidden">
-                         <div class="bg-indigo-100 p-4 rounded-lg text-center">
-                             <p class="text-sm text-indigo-800 font-semibold">Lectures Viewed</p>
-                             <p id="lectures-viewed-count" class="text-2xl font-bold text-indigo-900"></p>
-                         </div>
+                        <div class="bg-indigo-100 p-4 rounded-lg text-center">
+                            <p class="text-sm text-indigo-800 font-semibold">Lectures Viewed</p>
+                            <p id="lectures-viewed-count" class="text-2xl font-bold text-indigo-900"></p>
+                        </div>
                         <div class="bg-purple-100 p-4 rounded-lg text-center">
-                             <p class="text-sm text-purple-800 font-semibold">Chapters Started</p>
-                             <p id="chapters-started-count" class="text-2xl font-bold text-purple-900"></p>
-                         </div>
+                            <p class="text-sm text-purple-800 font-semibold">Chapters Started</p>
+                            <p id="chapters-started-count" class="text-2xl font-bold text-purple-900"></p>
+                        </div>
                     </div>
 
-                    <!-- Activity Chart -->
                     <div class="mb-6">
                         <canvas id="activity-chart"></canvas>
                     </div>
 
                     <div id="activity-log-list" class="space-y-3 max-h-[40vh] overflow-y-auto">
-                        <!-- Activity log items will be injected here -->
-                    </div>
+                        </div>
                 </div>
             </div>
 
-            <!-- Quiz Screen -->
             <div id="quiz-container" class="w-full hidden">
-                 <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
+                <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
                     <div class="flex items-center gap-4">
                         <button id="end-quiz-btn" class="text-slate-600 hover:text-red-600 transition-colors text-2xl" title="End Quiz" aria-label="End Quiz"><i class="fas fa-stop-circle"></i></button>
                     </div>
@@ -414,7 +380,7 @@
                     <div id="controls-container" class="mt-8 flex justify-between items-center">
                         <button id="previous-btn" class="bg-slate-300 text-slate-800 font-bold py-3 px-6 rounded-lg hover:bg-slate-400 transition-colors action-btn">Previous</button>
                         <div class="flex items-center gap-4">
-                             <button id="navigator-btn" class="text-2xl text-slate-500 hover:text-blue-600 transition-colors" title="Question Navigator" aria-label="Question Navigator"><i class="fas fa-th"></i></button>
+                            <button id="navigator-btn" class="text-2xl text-slate-500 hover:text-blue-600 transition-colors" title="Question Navigator" aria-label="Question Navigator"><i class="fas fa-th"></i></button>
                             <button id="flag-btn" class="flag-btn text-2xl text-slate-400 hover:text-amber-500 transition-colors" title="Flag for Review" aria-label="Flag for Review"><i class="far fa-flag"></i></button>
                             <button id="hint-btn" class="text-2xl text-slate-500 hover:text-yellow-500 transition-colors" title="Show Hint" aria-label="Show Hint"><i class="fas fa-lightbulb"></i></button>
                             <button id="quiz-note-btn" class="text-2xl text-slate-500 hover:text-amber-500 transition-colors note-icon" title="My Note"><i class="fas fa-sticky-note"></i></button>
@@ -438,7 +404,6 @@
         </footer>
     </div>
 
-    <!-- Modals (Navigator, Confirmation, Image Viewer, Note) -->
     <div id="modal-backdrop" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
         <div id="confirmation-modal" class="bg-white rounded-lg p-8 shadow-xl max-w-sm w-full hidden">
             <h3 id="modal-title" class="text-xl font-bold mb-4">Are you sure?</h3>
@@ -456,7 +421,7 @@
             </div>
         </div>
         <div id="image-viewer-modal" class="bg-white rounded-lg p-4 shadow-xl max-w-4xl w-full hidden relative">
-            <button id="image-viewer-close-btn" class="absolute top-2 right-2 text-2xl text-gray-600 hover:text-black">&times;</button>
+            <button id="image-viewer-close-btn" class="absolute top-2 right-2 text-2xl text-gray-600 hover:text-black">×</button>
             <img id="modal-image" src="" alt="Full size image" class="max-w-full max-h-[80vh] mx-auto">
         </div>
         <div id="note-modal" class="bg-white rounded-lg p-6 shadow-xl max-w-lg w-full hidden">
@@ -464,7 +429,7 @@
             <textarea id="note-textarea" class="w-full h-40 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Write your personal note here..."></textarea>
             <div class="flex justify-end gap-4 mt-4">
                 <button id="note-cancel-btn" class="action-btn bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancel</button>
-                <button id="note-save-btn" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Save & Close</button>
+                <button id="note-save-btn" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Save</button>
             </div>
         </div>
     </div>
@@ -472,30 +437,31 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         // --- URLS FOR GOOGLE SHEETS ---
-        const API_URL = 'https://script.google.com/macros/s/AKfycbzx8gRgbYZw8Rrg348q2dlsRd7yQ9IXUNUPBDUf-Q5Wb9LntLuKY-ozmnbZOOuQsDU_3w/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxdi7t08HZwJpGmTeO3QznmGRe-2thE4OjnCCDYC7km/dev';
         
         // --- APP DATA ---
         let allQuestions = [];
-        let freeTestQuestions = []; // For the free test
-        let isFreeTestDataLoaded = false; // To track loading status
         let groupedLectures = {};
+        let validUsers = [];
         let userQuizNotes = [];
         let userLectureNotes = [];
         let navigationHistory = [];
         let currentUser = null;
         let viewedLectures = new Set();
-        let fullActivityLog = [];
+        let fullActivityLog = []; // To store the fetched log once
         let activityChartInstance = null;
         let currentNote = { type: null, itemId: null };
+        let freeTestQuestions = []; // <-- التعديل الأول: إضافة متغير جديد
 
         // --- DOM ELEMENTS ---
-        // (This assumes all getElementById calls are here as in your original file)
         const globalHeader = document.getElementById('global-header');
         const globalHomeBtn = document.getElementById('global-home-btn');
         const logoutBtn = document.getElementById('logout-btn');
         const activityLogBtn = document.getElementById('activity-log-btn');
         const notesBtn = document.getElementById('notes-btn');
         const userNameDisplay = document.getElementById('user-name-display');
+        
+        // Screens
         const loginContainer = document.getElementById('login-container');
         const mainMenuContainer = document.getElementById('main-menu-container');
         const lecturesContainer = document.getElementById('lectures-container');
@@ -504,6 +470,8 @@
         const quizContainer = document.getElementById('quiz-container');
         const activityLogContainer = document.getElementById('activity-log-container');
         const notesContainer = document.getElementById('notes-container');
+
+        // Login
         const loginForm = document.getElementById('login-form');
         const loginLoader = document.getElementById('login-loader');
         const loginLoadingText = document.getElementById('login-loading-text');
@@ -511,12 +479,136 @@
         const usernameInput = document.getElementById('username');
         const passwordInput = document.getElementById('password');
         const freeTestBtn = document.getElementById('free-test-btn');
-        // ... and so on for all your elements
+
+        // Main Menu
+        const lecturesBtn = document.getElementById('lectures-btn');
+        const qbankBtn = document.getElementById('qbank-btn');
+        const lastLectureRibbon = document.getElementById('last-lecture-ribbon');
+        const lastQuizRibbon = document.getElementById('last-quiz-ribbon');
+
+        // Lectures Screen
+        const lecturesBackBtn = document.getElementById('lectures-back-btn');
+        const lectureSearchInput = document.getElementById('lecture-search-input');
+        const lecturesLoader = document.getElementById('lectures-loader');
+        const lecturesList = document.getElementById('lectures-list');
+
+        // Notes Screen
+        const notesBackBtn = document.getElementById('notes-back-btn');
+        const notesFilterQuizzes = document.getElementById('notes-filter-quizzes');
+        const notesFilterLectures = document.getElementById('notes-filter-lectures');
+        const notesList = document.getElementById('notes-list');
+
+        // Activity Log
+        const activityBackBtn = document.getElementById('activity-back-btn');
+        const allSummary = document.getElementById('all-summary');
+        const quizSummary = document.getElementById('quiz-summary');
+        const lectureSummary = document.getElementById('lecture-summary');
+        const allLecturesProgress = document.getElementById('all-lectures-progress');
+        const allQuestionsProgress = document.getElementById('all-questions-progress');
+        const totalCorrectAnswers = document.getElementById('total-correct-answers');
+        const totalIncorrectAnswers = document.getElementById('total-incorrect-answers');
+        const overallAccuracy = document.getElementById('overall-accuracy');
+        const lecturesViewedCount = document.getElementById('lectures-viewed-count');
+        const chaptersStartedCount = document.getElementById('chapters-started-count');
+        const activityLogList = document.getElementById('activity-log-list');
+        const logFilterAll = document.getElementById('log-filter-all');
+        const logFilterQuizzes = document.getElementById('log-filter-quizzes');
+        const logFilterLectures = document.getElementById('log-filter-lectures');
+        const activityChartCanvas = document.getElementById('activity-chart');
+
+        // Q-Bank Screen
+        const qbankBackBtn = document.getElementById('qbank-back-btn');
+        const loader = document.getElementById('loader');
+        const loadingText = document.getElementById('loading-text');
+        const mockQCountInput = document.getElementById('mock-q-count');
+        const customTimerInput = document.getElementById('custom-timer-input');
+        const toggleCustomOptionsBtn = document.getElementById('toggle-custom-options-btn');
+        const customExamOptions = document.getElementById('custom-exam-options');
+        const chapterSelectMock = document.getElementById('chapter-select-mock');
+        const sourceSelectMock = document.getElementById('source-select-mock');
+        const startMockBtn = document.getElementById('start-mock-btn');
+        const mockError = document.getElementById('mock-error');
+        const browseByChapterBtn = document.getElementById('browse-by-chapter-btn');
+        const browseBySourceBtn = document.getElementById('browse-by-source-btn');
+
+        // List Screen
+        const listBackBtn = document.getElementById('list-back-btn');
+        const listTitle = document.getElementById('list-title');
+        const listItems = document.getElementById('list-items');
+        
+        // Quiz Screen
+        const quizTitle = document.getElementById('quiz-title');
+        const timerDisplay = document.getElementById('timer');
+        const progressText = document.getElementById('progress-text');
+        const sourceText = document.getElementById('source-text');
+        const questionText = document.getElementById('question-text');
+        const questionImageContainer = document.getElementById('question-image-container');
+        const answerButtons = document.getElementById('answer-buttons-quiz');
+        const questionContainer = document.getElementById('question-container');
+        const controlsContainer = document.getElementById('controls-container');
+        const hintBtn = document.getElementById('hint-btn');
+        const hintText = document.getElementById('hint-text');
+        const previousBtn = document.getElementById('previous-btn');
+        const nextSkipBtn = document.getElementById('next-skip-btn');
+        const flagBtn = document.getElementById('flag-btn');
+        const quizNoteBtn = document.getElementById('quiz-note-btn');
+        const endQuizBtn = document.getElementById('end-quiz-btn');
+        const scoreProgressText = document.getElementById('score-progress-text');
+        const scoreBarCorrect = document.getElementById('score-bar-correct');
+        const scoreBarIncorrect = document.getElementById('score-bar-incorrect');
+        const resultsContainer = document.getElementById('results-container');
+        const scoreText = document.getElementById('score-text');
+        const totalQuestionsSpan = document.getElementById('total-questions');
+        const restartBtn = document.getElementById('restart-btn');
+        const resultsHomeBtn = document.getElementById('results-home-btn');
+
+        // Modals
+        const modalBackdrop = document.getElementById('modal-backdrop');
+        const confirmationModal = document.getElementById('confirmation-modal');
+        const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+        const modalCancelBtn = document.getElementById('modal-cancel-btn');
+        const questionNavigatorModal = document.getElementById('question-navigator-modal');
+        const navigatorBtn = document.getElementById('navigator-btn');
+        const navigatorGrid = document.getElementById('navigator-grid');
+        const navigatorCloseBtn = document.getElementById('navigator-close-btn');
+        const imageViewerModal = document.getElementById('image-viewer-modal');
+        const modalImage = document.getElementById('modal-image');
+        const imageViewerCloseBtn = document.getElementById('image-viewer-close-btn');
+        const noteModal = document.getElementById('note-modal');
+        const noteModalTitle = document.getElementById('note-modal-title');
+        const noteTextarea = document.getElementById('note-textarea');
+        const noteSaveBtn = document.getElementById('note-save-btn');
+        const noteCancelBtn = document.getElementById('note-cancel-btn');
+
+        // --- QUIZ STATE ---
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let currentQuizQuestions = [];
+        let timerInterval;
+        let flaggedIndices = new Set();
+        let userAnswers = [];
+        let modalConfirmAction = null;
+        const DEFAULT_TIME_PER_QUESTION = 45;
+        let currentQuizTimePerQuestion = DEFAULT_TIME_PER_QUESTION;
 
         // --- FUNCTIONS ---
 
+        function logUserActivity(eventData) {
+            if (!API_URL || !currentUser || currentUser.Role === 'Guest') return;
+            const payload = {
+                ...eventData,
+                userId: currentUser.UniqueID,
+                userName: currentUser.Name
+            };
+            fetch(API_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).catch(error => console.error('Error logging activity:', error));
+        }
+
         function parseQuestions(data) {
-            // This function can be used for both full and free test sheets
             return data.filter(row => row.Chapter && String(row.Chapter).trim() && row.Question && String(row.Question).trim()).map(row => {
                 const answerOptions = [];
                 if (row.CorrectAnswer && String(row.CorrectAnswer).trim() !== '') answerOptions.push({ text: String(row.CorrectAnswer), isCorrect: true, rationale: row.CorrectRationale || '' });
@@ -526,99 +618,939 @@
                 return { UniqueID: row.UniqueID, chapter: row.Chapter, question: row.Question, hint: row.Hint || '', source: row.Source || '', ImageURL: row.ImageURL || '', answerOptions: answerOptions };
             });
         }
-
-        // Renamed and updated to fetch free test data on page load
-        async function loadInitialPublicData() {
+        
+        function groupLecturesByChapter(lectureData) {
+            const chapters = {};
+            lectureData.forEach(row => {
+                const chapterName = row.Chapter;
+                if (!chapterName || String(chapterName).length < 2) {
+                    return; 
+                }
+                if (!chapters[chapterName]) {
+                    chapters[chapterName] = { topics: [], mock: null, icon: '' };
+                }
+                if (row.LectureName) {
+                    chapters[chapterName].topics.push({ 
+                        id: row.UniqueID,
+                        name: row.LectureName, 
+                        link: row.LectureURL
+                    });
+                }
+                if (row['Mock Link'] && !chapters[chapterName].mock) {
+                    chapters[chapterName].mock = { 
+                        link: row['Mock Link'], 
+                        name: row['Mock Name'] || 'Mock Exam'
+                    };
+                }
+                if(row.ChapterIcon && !chapters[chapterName].icon) {
+                    chapters[chapterName].icon = row.ChapterIcon;
+                }
+            });
+            return chapters;
+        }
+        
+        // <-- التعديل الثاني: تحديث هذه الدالة
+        async function loadInitialData() {
+            loginLoader.classList.remove('hidden');
+            loginLoadingText.classList.remove('hidden');
             try {
-                const response = await fetch(`${API_URL}?request=freeTestData&t=${new Date().getTime()}`);
-                if (!response.ok) throw new Error('Could not load free test.');
+                const response = await fetch(`${API_URL}?request=initialData&t=${new Date().getTime()}`);
+                if (!response.ok) throw new Error('Network response was not ok.');
+                const data = await response.json();
+                if (data.error) throw new Error(data.error);
+
+                validUsers = data.users;
+                freeTestQuestions = parseQuestions(data.freeTestQuestions || []);
+
+                loginLoader.classList.add('hidden');
+                loginLoadingText.classList.add('hidden');
+                loginForm.classList.remove('hidden');
+            } catch (error) {
+                console.error("Error loading initial data:", error);
+                loginLoadingText.textContent = `Failed to load data. ${error.message}`;
+            }
+        }
+
+        async function loadContentData() {
+            try {
+                const response = await fetch(`${API_URL}?request=contentData&t=${new Date().getTime()}`);
+                if (!response.ok) throw new Error('Network response was not ok.');
+                const data = await response.json();
+                if (data.error) throw new Error(data.error);
+
+                allQuestions = parseQuestions(data.questions);
+                groupedLectures = groupLecturesByChapter(data.lectures);
+                
+                populateCustomExamOptions();
+                renderLectures();
+                lecturesLoader.classList.add('hidden');
+                qbankBtn.classList.remove('loading');
+                lecturesBtn.classList.remove('loading');
+
+            } catch (error) {
+                console.error("Error loading content data:", error);
+                lecturesLoader.textContent = `Failed to load content. ${error.message}`;
+            }
+        }
+
+        async function loadUserData() {
+            if (!currentUser || currentUser.Role === 'Guest') return;
+            try {
+                const response = await fetch(`${API_URL}?request=userData&userId=${currentUser.UniqueID}&t=${new Date().getTime()}`);
+                if (!response.ok) throw new Error('Could not fetch user data.');
+                
                 const data = await response.json();
                 if (data.error) throw new Error(data.error);
                 
-                freeTestQuestions = parseQuestions(data.freeQuestions); // Use the correct key from the response
-                isFreeTestDataLoaded = true;
-
-                // Update the button to be clickable
-                freeTestBtn.disabled = false;
-                freeTestBtn.innerHTML = `<i class="fas fa-vial mr-2"></i> Try a Free Test`;
-
+                fullActivityLog = data.logs || [];
+                userQuizNotes = data.quizNotes || [];
+                userLectureNotes = data.lectureNotes || [];
             } catch (error) {
-                console.error("Error loading free test data:", error);
-                freeTestBtn.innerHTML = `<i class="fas fa-exclamation-circle mr-2"></i> Free Test Unavailable`;
-                // The button remains disabled
+                console.error('Error loading user data:', error);
             }
         }
 
-        // Updated to use the pre-loaded freeTestQuestions array
-        function startFreeTest() {
-            if (!isFreeTestDataLoaded || freeTestQuestions.length === 0) {
-                alert("The Free Test is currently unavailable or still loading. Please try again in a moment.");
-                return;
-            }
-            // Use all questions from the free test sheet, shuffled
-            const shuffled = [...freeTestQuestions].sort(() => 0.5 - Math.random());
-            
-            currentUser = { Name: 'Guest', UniqueID: `guest_${Date.now()}`, Role: 'Guest' };
-            launchQuiz(shuffled, "Free Sample Test");
+        function populateCustomExamOptions() {
+            const chapters = [...new Set(allQuestions.map(q => q.chapter))].sort();
+            const sources = [...new Set(allQuestions.map(q => q.source).filter(s => s))].sort();
+            chapterSelectMock.innerHTML = '';
+            sourceSelectMock.innerHTML = '';
+            chapters.forEach(chapter => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center';
+                div.innerHTML = `<input id="chapter-${chapter.replace(/\s+/g, '-')}" name="chapter" value="${chapter}" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"><label for="chapter-${chapter.replace(/\s+/g, '-')}" class="ml-3 text-sm text-gray-600">${chapter}</label>`;
+                chapterSelectMock.appendChild(div);
+            });
+            sources.forEach(source => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center';
+                div.innerHTML = `<input id="source-${source.replace(/\s+/g, '-')}" name="source" value="${source}" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"><label for="source-${source.replace(/\s+/g, '-')}" class="ml-3 text-sm text-gray-600">${source}</label>`;
+                sourceSelectMock.appendChild(div);
+            });
         }
-        
-        // Secure login process
+
         async function handleLogin(event) {
             event.preventDefault();
-            loginError.classList.add('hidden');
-            loginLoader.classList.remove('hidden');
-            loginLoadingText.classList.remove('hidden');
-
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        eventType: 'login',
-                        username: usernameInput.value,
-                        password: passwordInput.value
-                    })
-                });
-
-                const result = await response.json();
-                if (result.error) throw new Error(result.error);
-
-                if (result.user) {
-                    currentUser = result.user;
-                    loadUserProgress();
-                    showMainMenuScreen();
-                    await Promise.all([loadContentData(), loadUserData()]);
-                } else {
-                     throw new Error("Login failed. Please check your credentials.");
-                }
-            } catch (error) {
-                loginError.textContent = error.message;
+            const user = validUsers.find(u => u.Username === usernameInput.value && String(u.Password) === passwordInput.value);
+            if (user) {
+                currentUser = user;
+                loadUserProgress();
+                showMainMenuScreen();
+                await Promise.all([loadContentData(), loadUserData()]);
+            } else {
                 loginError.classList.remove('hidden');
-            } finally {
-                loginLoader.classList.add('hidden');
-                loginLoadingText.classList.add('hidden');
+            }
+        }
+        
+        function showScreen(screenToShow, isGuest = false) {
+            [loginContainer, mainMenuContainer, lecturesContainer, qbankContainer, listContainer, quizContainer, activityLogContainer, notesContainer].forEach(screen => {
+                if(screen) screen.classList.add('hidden');
+            });
+            if(screenToShow) screenToShow.classList.remove('hidden');
+
+            if (screenToShow !== loginContainer) {
+                globalHeader.classList.remove('hidden');
+                if (isGuest) {
+                    userNameDisplay.classList.add('hidden');
+                    logoutBtn.classList.add('hidden');
+                    activityLogBtn.classList.add('hidden');
+                    notesBtn.classList.add('hidden');
+                } else {
+                    userNameDisplay.textContent = currentUser.Name;
+                    userNameDisplay.classList.remove('hidden');
+                    logoutBtn.classList.remove('hidden');
+                    activityLogBtn.classList.remove('hidden');
+                    notesBtn.classList.remove('hidden');
+                }
+            } else {
+                globalHeader.classList.add('hidden');
             }
         }
 
-        // The rest of your functions (loadContentData, loadUserData, showScreen, etc.)
-        // should be included here. They are omitted for brevity but are required for the
-        // app to work. Please copy them from your full, working file.
-        // For example:
-        async function loadContentData() { /* ... your original code ... */ }
-        async function loadUserData() { /* ... your original code ... */ }
-        function showScreen(screenToShow, isGuest = false) { /* ... your original code ... */ }
-        // ... and so on for all other functions.
+        async function showMainMenuScreen() {
+            showScreen(mainMenuContainer);
+            navigationHistory = [showMainMenuScreen];
+            await fetchAndShowLastActivity();
+        }
 
+        function showLecturesScreen() {
+            showScreen(lecturesContainer);
+            navigationHistory.push(showLecturesScreen);
+            renderLectures();
+        }
+
+        function showQbankScreen() {
+            showScreen(qbankContainer);
+            navigationHistory.push(showQbankScreen);
+        }
+        
+        function renderLectures(filterText = '') {
+            lecturesList.innerHTML = '';
+            const lowerCaseFilter = filterText.toLowerCase();
+            const chapterNames = Object.keys(groupedLectures).sort();
+            let chaptersFound = 0;
+
+            chapterNames.forEach(chapterName => {
+                const chapterData = groupedLectures[chapterName];
+                const isChapterMatch = chapterName.toLowerCase().includes(lowerCaseFilter);
+                const isTopicMatch = chapterData.topics.some(topic => topic.name.toLowerCase().includes(lowerCaseFilter));
+                if (filterText && !isChapterMatch && !isTopicMatch) return;
+                chaptersFound++;
+                const details = document.createElement('details');
+                details.className = 'bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm';
+                details.open = !!filterText;
+                const summary = document.createElement('summary');
+                summary.className = 'p-4 flex justify-between items-center cursor-pointer hover:bg-slate-50 font-bold text-slate-800 text-lg';
+                
+                const lectureCount = chapterData.topics.length;
+                const mockCount = chapterData.mock ? 1 : 0;
+                
+                summary.innerHTML = `
+                    <span class="flex items-center"><i class="${chapterData.icon || 'fas fa-layer-group'} mr-3 text-cyan-600 w-5 text-center"></i>${chapterName}</span>
+                    <div class="flex items-center gap-4">
+                        <span class="text-xs font-semibold text-slate-500 bg-slate-200 px-2 py-1 rounded-full">${lectureCount} Lectures</span>
+                        ${mockCount > 0 ? `<span class="text-xs font-semibold text-slate-500 bg-slate-200 px-2 py-1 rounded-full">${mockCount} Mock</span>` : ''}
+                        <i class="fas fa-chevron-down transition-transform duration-300 text-slate-500"></i>
+                    </div>
+                `;
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'p-4 bg-slate-50 border-t border-slate-200';
+                const topicList = document.createElement('ul');
+                topicList.className = 'space-y-2';
+                chapterData.topics.forEach(topic => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'flex items-center justify-between p-3 rounded-md hover:bg-blue-100 transition-colors group';
+                    const isViewed = viewedLectures.has(topic.link);
+                    
+                    if (isViewed) {
+                        listItem.classList.add('lecture-viewed');
+                    }
+
+                    const controls = document.createElement('div');
+                    controls.className = 'flex items-center gap-3';
+
+                    const icon = document.createElement('i');
+                    icon.className = `fas ${isViewed ? 'fa-check-circle' : 'fa-play-circle'} mr-3 text-blue-500 view-toggle-icon`;
+                    icon.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleLectureViewed(topic.link, topic.name);
+                    });
+
+                    const noteIcon = document.createElement('i');
+                    const hasNote = userLectureNotes.some(note => note.LectureID === topic.id);
+                    noteIcon.className = `fas fa-sticky-note text-slate-400 hover:text-amber-500 note-icon ${hasNote ? 'has-note' : ''}`;
+                    noteIcon.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            openNoteModal('lecture', topic.id, topic.name);
+                    });
+                    
+                    controls.appendChild(icon);
+                    controls.appendChild(noteIcon);
+                    
+                    const content = document.createElement('div');
+                    content.className = "flex-grow";
+
+                    if (topic.link) {
+                        const link = document.createElement('a');
+                        link.href = topic.link;
+                        link.target = '_blank';
+                        link.className = "lecture-name text-slate-800 font-medium";
+                        link.textContent = topic.name;
+                        content.appendChild(link);
+                    } else {
+                        const nameSpan = document.createElement('span');
+                        nameSpan.className = "lecture-name text-slate-500";
+                        nameSpan.textContent = topic.name;
+                        content.appendChild(nameSpan);
+                    }
+                    
+                    listItem.appendChild(controls);
+                    listItem.appendChild(content);
+                    
+                    topicList.appendChild(listItem);
+                });
+                contentDiv.appendChild(topicList);
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'mt-4 pt-4 border-t border-slate-200 flex flex-col sm:flex-row gap-3';
+                const relevantQuestions = allQuestions.filter(q => q.chapter.trim().toLowerCase() === chapterName.trim().toLowerCase());
+                if (relevantQuestions.length > 0) {
+                    const quizButton = document.createElement('button');
+                    quizButton.className = 'w-full action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2';
+                    quizButton.innerHTML = `<i class="fas fa-pencil-alt"></i> Test Chapter (${relevantQuestions.length} Qs)`;
+                    quizButton.addEventListener('click', () => startChapterQuiz(chapterName, relevantQuestions));
+                    actionsDiv.appendChild(quizButton);
+                }
+                if (chapterData.mock && chapterData.mock.link) {
+                    const mockButton = document.createElement('a');
+                    mockButton.href = chapterData.mock.link;
+                    mockButton.target = '_blank';
+                    mockButton.className = 'w-full action-btn bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2';
+                    mockButton.innerHTML = `<i class="fas fa-vial"></i> ${chapterData.mock.name}`;
+                    actionsDiv.appendChild(mockButton);
+                }
+                if(actionsDiv.hasChildNodes()){
+                    contentDiv.appendChild(actionsDiv);
+                }
+                details.appendChild(summary);
+                details.appendChild(contentDiv);
+                lecturesList.appendChild(details);
+            });
+            if (chaptersFound === 0) {
+                lecturesList.innerHTML = `<p class="text-slate-500 text-center">No lectures found matching your search.</p>`;
+            }
+        }
+
+        function toggleLectureViewed(lectureLink, lectureName) {
+            if (viewedLectures.has(lectureLink)) {
+                viewedLectures.delete(lectureLink);
+            } else {
+                viewedLectures.add(lectureLink);
+                logUserActivity({
+                    eventType: 'ViewLecture',
+                    lectureName: lectureName 
+                });
+            }
+            saveUserProgress();
+            renderLectures(lectureSearchInput.value);
+        }
+
+        function saveUserProgress() {
+            if (!currentUser || currentUser.Role === 'Guest') return;
+            localStorage.setItem(`viewedLectures_${currentUser.UniqueID}`, JSON.stringify(Array.from(viewedLectures)));
+        }
+
+        function loadUserProgress() {
+            if (!currentUser || currentUser.Role === 'Guest') return;
+            const savedLectures = localStorage.getItem(`viewedLectures_${currentUser.UniqueID}`);
+            if (savedLectures) {
+                viewedLectures = new Set(JSON.parse(savedLectures));
+            }
+        }
+
+        async function fetchAndShowLastActivity() {
+            if (!currentUser || currentUser.Role === 'Guest') return;
+            lastLectureRibbon.classList.add('hidden');
+            lastQuizRibbon.classList.add('hidden');
+            try {
+                const response = await fetch(`${API_URL}?request=userData&userId=${currentUser.UniqueID}&t=${new Date().getTime()}`);
+                if (!response.ok) return;
+                const data = await response.json();
+                if (data.error || !data.logs || data.logs.length === 0) return;
+
+                const lastLecture = data.logs.find(log => log.eventType === 'ViewLecture');
+                const lastQuiz = data.logs.find(log => log.eventType === 'FinishQuiz');
+
+                if (lastLecture) {
+                    lastLectureRibbon.innerHTML = `<i class="fas fa-video mr-2"></i> Last Lecture Viewed: <strong>${lastLecture.title}</strong>`;
+                    lastLectureRibbon.classList.remove('hidden');
+                }
+                if (lastQuiz) {
+                    lastQuizRibbon.innerHTML = `<i class="fas fa-check-double mr-2"></i> Last Quiz: <strong>${lastQuiz.title}</strong> (Score: ${lastQuiz.score}/${lastQuiz.total})`;
+                    lastQuizRibbon.classList.remove('hidden');
+                }
+
+            } catch (error) {
+                console.error('Could not fetch last activity:', error);
+            }
+        }
+
+        async function showActivityLog() {
+            showScreen(activityLogContainer);
+            navigationHistory.push(showActivityLog);
+            activityLogList.innerHTML = '<div class="loader"></div>';
+
+            try {
+                const response = await fetch(`${API_URL}?request=userData&userId=${currentUser.UniqueID}&t=${new Date().getTime()}`);
+                if (!response.ok) throw new Error('Could not fetch activity logs.');
+                
+                const data = await response.json();
+                if (data.error) throw new Error(data.error);
+                
+                fullActivityLog = data.logs || [];
+                renderFilteredLog('all');
+
+            } catch (error) {
+                console.error('Error loading activity log:', error);
+                activityLogList.innerHTML = `<p class="text-center text-red-500">${error.message}</p>`;
+            }
+        }
+
+        function renderFilteredLog(filter) {
+            activityLogList.innerHTML = '';
+            document.querySelectorAll('#activity-log-container .filter-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`log-filter-${filter}`).classList.add('active');
+
+            allSummary.classList.add('hidden');
+            quizSummary.classList.add('hidden');
+            lectureSummary.classList.add('hidden');
+
+            const logsToDisplay = fullActivityLog.filter(log => {
+                if (filter === 'all') return true;
+                if (filter === 'quizzes') return log.eventType === 'FinishQuiz';
+                if (filter === 'lectures') return log.eventType === 'ViewLecture';
+                return false;
+            });
+            
+            renderActivityChart(logsToDisplay);
+
+            const quizLogs = fullActivityLog.filter(log => log.eventType === 'FinishQuiz');
+            let totalCorrect = 0;
+            let totalAttemptedInQuizzes = 0;
+
+            quizLogs.forEach(log => {
+                const score = parseInt(log.score, 10) || 0;
+                const total = parseInt(log.total, 10) || 0;
+                totalCorrect += score;
+                totalAttemptedInQuizzes += total;
+            });
+            const totalIncorrect = totalAttemptedInQuizzes - totalCorrect;
+
+            if (filter === 'all') {
+                allSummary.classList.remove('hidden');
+                const totalLecturesInSystem = Object.values(groupedLectures).reduce((acc, chapter) => acc + chapter.topics.length, 0);
+                const viewedLectureCount = new Set(fullActivityLog.filter(l => l.eventType === 'ViewLecture').map(l => l.title)).size;
+                allLecturesProgress.textContent = `${viewedLectureCount} / ${totalLecturesInSystem}`;
+                allQuestionsProgress.textContent = `${totalAttemptedInQuizzes} / ${allQuestions.length}`;
+
+            } else if (filter === 'quizzes') {
+                quizSummary.classList.remove('hidden');
+                totalCorrectAnswers.textContent = totalCorrect;
+                totalIncorrectAnswers.textContent = totalIncorrect;
+                const accuracy = totalAttemptedInQuizzes > 0 ? ((totalCorrect / totalAttemptedInQuizzes) * 100).toFixed(1) : 0;
+                overallAccuracy.textContent = `${accuracy}%`;
+            } else if (filter === 'lectures') {
+                lectureSummary.classList.remove('hidden');
+                const viewedLogs = fullActivityLog.filter(log => log.eventType === 'ViewLecture');
+                const uniqueViewedLectures = new Set(viewedLogs.map(l => l.title));
+                lecturesViewedCount.textContent = uniqueViewedLectures.size;
+                
+                const uniqueChapters = new Set();
+                viewedLogs.forEach(log => {
+                    for (const chapterName in groupedLectures) {
+                        if (groupedLectures[chapterName].topics.some(t => t.name === log.title)) {
+                            uniqueChapters.add(chapterName);
+                            break;
+                        }
+                    }
+                });
+                chaptersStartedCount.textContent = uniqueChapters.size;
+            }
+
+
+            if (logsToDisplay.length === 0) {
+                activityLogList.innerHTML = `<p class="text-center text-slate-500">No activity recorded for this filter.</p>`;
+                return;
+            }
+
+            logsToDisplay.forEach(log => {
+                if (log.eventType === 'FinishQuiz' || log.eventType === 'ViewLecture') {
+                    const logItem = document.createElement('div');
+                    logItem.className = 'p-3 border rounded-lg flex justify-between items-center bg-white';
+                    
+                    const date = new Date(log.timestamp);
+                    const formattedDate = date.toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute:'2-digit' });
+
+                    if (log.eventType === 'FinishQuiz') {
+                        logItem.innerHTML = `
+                            <div>
+                                <p class="font-bold text-slate-800">${log.title}</p>
+                                <p class="text-sm text-slate-500">${formattedDate}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-bold text-lg ${log.score / log.total >= 0.5 ? 'text-green-600' : 'text-red-600'}">
+                                    ${log.score} / ${log.total}
+                                </p>
+                                <p class="text-xs text-slate-500">Score</p>
+                            </div>
+                        `;
+                    } else if (log.eventType === 'ViewLecture') {
+                        logItem.innerHTML = `
+                            <div>
+                                <p class="font-bold text-slate-800">${log.title}</p>
+                                <p class="text-sm text-slate-500">${formattedDate}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-bold text-lg text-green-600"><i class="fas fa-video"></i></p>
+                                <p class="text-xs text-slate-500">Viewed</p>
+                            </div>
+                        `;
+                    }
+                    activityLogList.appendChild(logItem);
+                }
+            });
+        }
+
+        function renderActivityChart(logs) {
+            if (activityChartInstance) {
+                activityChartInstance.destroy();
+            }
+            const labels = [];
+            const activityByDay = {};
+
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const key = d.toISOString().split('T')[0]; // YYYY-MM-DD
+                labels.push(d.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric'}));
+                activityByDay[key] = { lectures: 0, quizzes: 0 };
+            }
+
+            logs.forEach(log => {
+                const logDate = new Date(log.timestamp).toISOString().split('T')[0];
+                if (activityByDay.hasOwnProperty(logDate)) {
+                    if (log.eventType === 'ViewLecture') {
+                        activityByDay[logDate].lectures++;
+                    } else if (log.eventType === 'FinishQuiz') {
+                        activityByDay[logDate].quizzes++;
+                    }
+                }
+            });
+
+            const lectureData = Object.values(activityByDay).map(d => d.lectures);
+            const quizData = Object.values(activityByDay).map(d => d.quizzes);
+
+            activityChartInstance = new Chart(activityChartCanvas, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Lectures',
+                            data: lectureData,
+                            backgroundColor: 'rgba(20, 184, 166, 0.6)', // Teal
+                            borderColor: 'rgb(13, 148, 136)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Quizzes',
+                            data: quizData,
+                            backgroundColor: 'rgba(59, 130, 246, 0.6)', // Blue
+                            borderColor: 'rgb(37, 99, 235)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: { stacked: true },
+                        y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 } }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Your Activity in the Last 7 Days'
+                        }
+                    }
+                }
+            });
+        }
+
+        function showSourceList() {
+            showScreen(listContainer);
+            navigationHistory.push(showSourceList);
+            listTitle.textContent = "Browse by Source";
+            listItems.innerHTML = '';
+            const sourceGroups = new Map();
+            allQuestions.forEach(q => {
+                const sourceName = (q.source && q.source.trim()) ? q.source.trim() : "Uncategorized";
+                const normalizedKey = sourceName.toLowerCase();
+                if (sourceGroups.has(normalizedKey)) {
+                    sourceGroups.get(normalizedKey).count++;
+                } else {
+                    sourceGroups.set(normalizedKey, { displayName: sourceName, count: 1 });
+                }
+            });
+            const sortedSources = [...sourceGroups.values()].sort((a, b) => a.displayName.localeCompare(b.displayName));
+            sortedSources.forEach(sourceGroup => {
+                const button = document.createElement('button');
+                button.innerHTML = `<span>${sourceGroup.displayName}</span> <span class="text-xs font-normal opacity-75">(${sourceGroup.count} Qs)</span>`;
+                button.className = 'action-btn w-full p-4 rounded-lg bg-indigo-600 text-white font-semibold text-lg hover:bg-indigo-700 flex flex-col items-center justify-center text-center';
+                button.addEventListener('click', () => showChapterList(sourceGroup.displayName));
+                listItems.appendChild(button);
+            });
+        }
+
+        function showChapterList(sourceFilter = 'All') {
+            showScreen(listContainer);
+            if (navigationHistory[navigationHistory.length - 1] !== showChapterList) {
+                navigationHistory.push(() => showChapterList(sourceFilter));
+            }
+            listTitle.textContent = sourceFilter === 'All' ? "All Chapters" : `Chapters in ${sourceFilter}`;
+            listItems.innerHTML = '';
+            const questionsToDisplay = (sourceFilter === 'All') ? allQuestions : allQuestions.filter(q => q.source === sourceFilter);
+            const chapters = {};
+            questionsToDisplay.forEach(q => {
+                if (!chapters[q.chapter]) chapters[q.chapter] = [];
+                chapters[q.chapter].push(q);
+            });
+            const sortedChapterNames = Object.keys(chapters).sort();
+            for (const chapterName of sortedChapterNames) {
+                const button = document.createElement('button');
+                button.innerHTML = `<span>${chapterName}</span> <span class="text-xs font-normal opacity-75">(${chapters[chapterName].length} Qs)</span>`;
+                button.className = 'action-btn w-full p-4 rounded-lg bg-blue-600 text-white font-semibold text-lg hover:bg-blue-700 flex flex-col items-center justify-center text-center';
+                button.addEventListener('click', () => startChapterQuiz(chapterName, chapters[chapterName]));
+                listItems.appendChild(button);
+            }
+        }
+
+        function startChapterQuiz(chapterName, questionsToUse) {
+            const shuffled = [...questionsToUse].sort(() => Math.random() - 0.5);
+            launchQuiz(shuffled, chapterName);
+        }
+
+        function handleMockExamStart() {
+            mockError.classList.add('hidden');
+            const requestedCount = parseInt(mockQCountInput.value, 10);
+            if (isNaN(requestedCount) || requestedCount <= 0) {
+                mockError.textContent = "Please enter a valid number of questions.";
+                mockError.classList.remove('hidden');
+                return;
+            }
+            const customTime = parseInt(customTimerInput.value, 10);
+            const selectedChapters = [...chapterSelectMock.querySelectorAll('input:checked')].map(el => el.value);
+            const selectedSources = [...sourceSelectMock.querySelectorAll('input:checked')].map(el => el.value);
+            let filteredQuestions = allQuestions;
+            if (selectedChapters.length > 0) filteredQuestions = filteredQuestions.filter(q => selectedChapters.includes(q.chapter));
+            if (selectedSources.length > 0) filteredQuestions = filteredQuestions.filter(q => selectedSources.includes(q.source));
+            if (filteredQuestions.length === 0) {
+                mockError.textContent = "No questions match the selected filters.";
+                mockError.classList.remove('hidden');
+                return;
+            }
+            if (requestedCount > filteredQuestions.length) {
+                mockError.textContent = `Only ${filteredQuestions.length} questions match your filters.`;
+                mockError.classList.remove('hidden');
+                return;
+            }
+            const shuffled = [...filteredQuestions].sort(() => Math.random() - 0.5);
+            const mockQuestions = shuffled.slice(0, requestedCount);
+            const timePerQuestion = (customTime && customTime > 0) ? customTime : DEFAULT_TIME_PER_QUESTION;
+            launchQuiz(mockQuestions, "Custom Mock Exam", timePerQuestion);
+        }
+
+        function launchQuiz(questions, title, timePerQuestion = DEFAULT_TIME_PER_QUESTION) {
+            showScreen(quizContainer, currentUser.Role === 'Guest');
+            currentQuestionIndex = 0;
+            score = 0;
+            currentQuizQuestions = questions;
+            currentQuizTimePerQuestion = timePerQuestion;
+            flaggedIndices.clear();
+            userAnswers = new Array(questions.length).fill(null);
+            resultsContainer.classList.add('hidden');
+            questionContainer.classList.remove('hidden');
+            controlsContainer.classList.remove('hidden');
+            quizTitle.textContent = title;
+            totalQuestionsSpan.textContent = currentQuizQuestions.length;
+            updateScoreBar();
+            showQuestion();
+        }
+
+        function updateScoreBar() {
+            const totalQuestions = currentQuizQuestions.length;
+            if (totalQuestions === 0) return;
+            const answeredQuestions = userAnswers.filter(a => a !== null).length;
+            const correctCount = userAnswers.filter(a => a && a.isCorrect).length;
+            const incorrectCount = answeredQuestions - correctCount;
+            scoreProgressText.textContent = `Score: ${correctCount} / ${answeredQuestions}`;
+            scoreBarCorrect.style.width = `${(correctCount / totalQuestions) * 100}%`;
+            scoreBarIncorrect.style.width = `${(incorrectCount / totalQuestions) * 100}%`;
+        }
+
+        function showQuestion() {
+            resetQuizState();
+            const currentQuestion = currentQuizQuestions[currentQuestionIndex];
+            
+            if (currentQuestion.ImageURL) {
+                const img = document.createElement('img');
+                img.src = currentQuestion.ImageURL;
+                img.alt = 'Question Image';
+                img.className = 'max-h-48 rounded-lg mx-auto mb-4 cursor-pointer hover:opacity-80 transition-opacity';
+                img.addEventListener('click', () => showImageModal(currentQuestion.ImageURL));
+                questionImageContainer.appendChild(img);
+            }
+
+            questionText.textContent = currentQuestion.question;
+            progressText.textContent = `Question ${currentQuestionIndex + 1} of ${currentQuizQuestions.length}`;
+            sourceText.textContent = `Source: ${currentQuestion.source || 'N/A'} | Chapter: ${currentQuestion.chapter || 'N/A'}`;
+            previousBtn.disabled = currentQuestionIndex === 0;
+            previousBtn.classList.toggle('opacity-50', currentQuestionIndex === 0);
+            nextSkipBtn.disabled = currentQuestionIndex === currentQuizQuestions.length - 1;
+            nextSkipBtn.classList.toggle('opacity-50', currentQuestionIndex === currentQuizQuestions.length - 1);
+            flagBtn.classList.toggle('flagged', flaggedIndices.has(currentQuestionIndex));
+            const shuffledAnswers = [...currentQuestion.answerOptions].sort(() => Math.random() - 0.5);
+            shuffledAnswers.forEach(answer => {
+                const buttonContainer = document.createElement('div');
+                const button = document.createElement('button');
+                button.textContent = answer.text;
+                button.className = 'answer-btn w-full text-left p-4 rounded-lg bg-slate-100 hover:bg-slate-200 border-2 border-transparent';
+                button.dataset.correct = answer.isCorrect;
+                button.addEventListener('click', (e) => selectAnswer(e, answer));
+                const rationale = document.createElement('p');
+                rationale.textContent = answer.rationale;
+                rationale.className = 'rationale text-sm mt-2 p-2 rounded-md';
+                buttonContainer.appendChild(button);
+                buttonContainer.appendChild(rationale);
+                answerButtons.appendChild(buttonContainer);
+            });
+            if (userAnswers[currentQuestionIndex] !== null) showAnswerResult();
+            hintText.textContent = currentQuestion.hint;
+            startTimer();
+        }
+
+        function startTimer() {
+            if (userAnswers[currentQuestionIndex] === null) {
+                let timeLeft = currentQuizTimePerQuestion;
+                timerDisplay.textContent = formatTime(timeLeft);
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    timerDisplay.textContent = formatTime(timeLeft);
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        handleTimeUp();
+                    }
+                }, 1000);
+            } else {
+                timerDisplay.textContent = 'Done';
+            }
+        }
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+        }
+
+        function handleTimeUp() {
+            userAnswers[currentQuestionIndex] = { answer: 'No Answer', isCorrect: false };
+            showAnswerResult();
+            updateScoreBar();
+        }
+
+        function resetQuizState() {
+            clearInterval(timerInterval);
+            answerButtons.innerHTML = '';
+            questionImageContainer.innerHTML = '';
+            hintBtn.classList.remove('hidden');
+            hintText.classList.add('hidden');
+        }
+
+        function selectAnswer(e, selectedAnswer) {
+            clearInterval(timerInterval);
+            if(userAnswers[currentQuestionIndex] === null && selectedAnswer.isCorrect) {
+                score++;
+            }
+            userAnswers[currentQuestionIndex] = { answer: selectedAnswer.text, isCorrect: selectedAnswer.isCorrect };
+            showAnswerResult();
+            updateScoreBar();
+            if (userAnswers.every(answer => answer !== null)) {
+                setTimeout(showResults, 1000);
+            }
+        }
+        
+        function showAnswerResult() {
+            Array.from(answerButtons.children).forEach(buttonContainer => {
+                const button = buttonContainer.querySelector('button');
+                const rationale = buttonContainer.querySelector('p');
+                if (button.dataset.correct === 'true') {
+                    button.classList.add('correct');
+                    rationale.classList.add('bg-green-100');
+                } else {
+                    button.classList.add('incorrect');
+                    rationale.classList.add('bg-red-100');
+                }
+                rationale.classList.add('visible');
+                button.disabled = true;
+            });
+            hintBtn.classList.add('hidden');
+        }
+
+        function showResults() {
+            questionContainer.classList.add('hidden');
+            controlsContainer.classList.add('hidden');
+            resultsContainer.classList.remove('hidden');
+            scoreText.textContent = score;
+            progressText.textContent = "Quiz Finished!";
+            
+            logUserActivity({
+                eventType: 'FinishQuiz',
+                quizTitle: quizTitle.textContent,
+                score: score,
+                totalQuestions: currentQuizQuestions.length
+            });
+        }
+
+        function handleNextQuestion() {
+            if (currentQuestionIndex < currentQuizQuestions.length - 1) {
+                currentQuestionIndex++;
+                showQuestion();
+            }
+        }
+        
+        function handlePreviousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                showQuestion();
+            }
+        }
+
+        function toggleFlag() {
+            flaggedIndices.has(currentQuestionIndex) ? flaggedIndices.delete(currentQuestionIndex) : flaggedIndices.add(currentQuestionIndex);
+            flagBtn.classList.toggle('flagged');
+        }
+
+        function showImageModal(src) {
+            modalImage.src = src;
+            confirmationModal.classList.add('hidden');
+            questionNavigatorModal.classList.add('hidden');
+            imageViewerModal.classList.remove('hidden');
+            modalBackdrop.classList.remove('hidden');
+        }
+
+        function showConfirmationModal(title, text, onConfirm) {
+            modalConfirmAction = onConfirm;
+            confirmationModal.querySelector('#modal-title').textContent = title;
+            confirmationModal.querySelector('#modal-text').textContent = text;
+            questionNavigatorModal.classList.add('hidden');
+            imageViewerModal.classList.add('hidden');
+            confirmationModal.classList.remove('hidden');
+            modalBackdrop.classList.remove('hidden');
+        }
+
+        function showQuestionNavigator() {
+            navigatorGrid.innerHTML = '';
+            currentQuizQuestions.forEach((_, index) => {
+                const button = document.createElement('button');
+                button.textContent = index + 1;
+                button.className = 'navigator-btn w-10 h-10 rounded-md font-semibold flex items-center justify-center';
+                const answer = userAnswers[index];
+                if (answer === null) button.classList.add('unanswered');
+                else if (answer.isCorrect) button.classList.add('correct');
+                else button.classList.add('incorrect');
+                if (flaggedIndices.has(index)) {
+                    const flagIcon = document.createElement('i');
+                    flagIcon.className = 'fas fa-flag flag-icon';
+                    button.appendChild(flagIcon);
+                }
+                button.addEventListener('click', () => {
+                    currentQuestionIndex = index;
+                    showQuestion();
+                    modalBackdrop.classList.add('hidden');
+                });
+                navigatorGrid.appendChild(button);
+            });
+            confirmationModal.classList.add('hidden');
+            imageViewerModal.classList.add('hidden');
+            questionNavigatorModal.classList.remove('hidden');
+            modalBackdrop.classList.remove('hidden');
+        }
+
+        function handleLogout() {
+            showConfirmationModal('Log Out?', 'Are you sure you want to log out?', () => {
+                currentUser = null;
+                navigationHistory = [];
+                usernameInput.value = '';
+                passwordInput.value = '';
+                showScreen(loginContainer);
+                modalBackdrop.classList.add('hidden');
+            });
+        }
+        
+        function triggerEndQuiz() {
+            showConfirmationModal('End Quiz?', 'Are you sure you want to end the quiz?', () => {
+                modalBackdrop.classList.add('hidden');
+                showResults();
+            });
+        }
+
+        function handleBackNavigation() {
+            if (navigationHistory.length > 1) {
+                navigationHistory.pop();
+                const previousPage = navigationHistory[navigationHistory.length - 1];
+                previousPage();
+            }
+        }
+
+        // <-- التعديل الثالث: تحديث هذه الدالة
+        function startFreeTest() {
+            if (freeTestQuestions.length === 0) {
+                alert("لا يمكن تحميل الاختبار المجاني حاليًا، حاول مرة أخرى.");
+                return;
+            }
+            currentUser = { Name: 'Guest', UniqueID: `guest_${Date.now()}`, Role: 'Guest' };
+            launchQuiz(freeTestQuestions, "Free Sample Test");
+        }
 
         // --- EVENT LISTENERS ---
         loginForm.addEventListener('submit', handleLogin);
         freeTestBtn.addEventListener('click', startFreeTest);
-        // ... (all other event listeners from your previous working version)
+        lecturesBtn.addEventListener('click', showLecturesScreen);
+        qbankBtn.addEventListener('click', showQbankScreen);
+        
+        // Back Buttons
+        lecturesBackBtn.addEventListener('click', handleBackNavigation);
+        qbankBackBtn.addEventListener('click', handleBackNavigation);
+        listBackBtn.addEventListener('click', handleBackNavigation);
+        activityBackBtn.addEventListener('click', handleBackNavigation);
 
+        // Global Header
+        globalHomeBtn.addEventListener('click', () => {
+            if (currentUser && currentUser.Role === 'Guest') {
+                showScreen(loginContainer);
+                currentUser = null;
+            } else {
+                showMainMenuScreen();
+            }
+        });
+        logoutBtn.addEventListener('click', handleLogout);
+        activityLogBtn.addEventListener('click', showActivityLog);
 
+        // Activity Log Filters
+        logFilterAll.addEventListener('click', () => renderFilteredLog('all'));
+        logFilterQuizzes.addEventListener('click', () => renderFilteredLog('quizzes'));
+        logFilterLectures.addEventListener('click', () => renderFilteredLog('lectures'));
+
+        // Lectures
+        lectureSearchInput.addEventListener('keyup', (e) => renderLectures(e.target.value));
+
+        // Q-Bank
+        startMockBtn.addEventListener('click', handleMockExamStart);
+        browseByChapterBtn.addEventListener('click', () => showChapterList('All'));
+        browseBySourceBtn.addEventListener('click', showSourceList);
+        toggleCustomOptionsBtn.addEventListener('click', () => customExamOptions.classList.toggle('visible'));
+
+        // Quiz
+        hintBtn.addEventListener('click', () => hintText.classList.remove('hidden'));
+        flagBtn.addEventListener('click', toggleFlag);
+        endQuizBtn.addEventListener('click', triggerEndQuiz);
+        previousBtn.addEventListener('click', handlePreviousQuestion);
+        nextSkipBtn.addEventListener('click', handleNextQuestion);
+        restartBtn.addEventListener('click', () => launchQuiz(currentQuizQuestions, quizTitle.textContent, currentQuizTimePerQuestion));
+        resultsHomeBtn.addEventListener('click', () => {
+            if (currentUser.Role === 'Guest') {
+                showScreen(loginContainer);
+                currentUser = null;
+            } else {
+                showMainMenuScreen();
+            }
+        });
+
+        // Modals
+        modalCancelBtn.addEventListener('click', () => modalBackdrop.classList.add('hidden'));
+        modalConfirmBtn.addEventListener('click', () => { if (modalConfirmAction) modalConfirmAction(); });
+        navigatorBtn.addEventListener('click', showQuestionNavigator);
+        navigatorCloseBtn.addEventListener('click', () => modalBackdrop.classList.add('hidden'));
+        imageViewerCloseBtn.addEventListener('click', () => modalBackdrop.classList.add('hidden'));
+        
         // --- INITIAL LOAD ---
-        loadInitialPublicData(); // Call the new function on page load
-
+        loadInitialData();
     });
     </script>
 
