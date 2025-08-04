@@ -141,6 +141,9 @@
             </a>
             <div class="flex items-center gap-4">
                 <span id="user-name-display" class="text-base font-medium text-slate-200 hidden sm:block"></span>
+                <button id="announcements-btn" class="text-white hover:text-slate-300 transition-colors text-2xl" title="Announcements" aria-label="Announcements">
+                    <i class="fas fa-bullhorn"></i>
+                </button>
                 <button id="notes-btn" class="text-white hover:text-slate-300 transition-colors text-2xl" title="My Notes" aria-label="My Notes">
                     <i class="fas fa-book-open"></i>
                 </button>
@@ -206,13 +209,14 @@
             <!-- Main Menu Screen -->
             <div id="main-menu-container" class="w-full hidden">
                 <div class="p-6 md:p-8">
+                    <div id="announcement-banner" class="hidden"></div>
                     <h2 class="text-3xl font-bold text-slate-800 text-center mb-2">Welcome to Plasticology!</h2>
                     <div id="last-activity-container" class="space-y-2 my-6">
                         <div id="last-lecture-ribbon" class="hidden p-3 bg-teal-100 border border-teal-200 text-teal-800 rounded-lg text-center text-sm font-medium"></div>
                         <div id="last-quiz-ribbon" class="hidden p-3 bg-blue-100 border border-blue-200 text-blue-800 rounded-lg text-center text-sm font-medium"></div>
                     </div>
                     <p class="text-slate-500 text-center mb-8">Let’s get started – choose a section</p>
-                    <div class="grid grid-cols-2 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
                         <button id="lectures-btn" class="main-menu-btn flex flex-col items-center justify-center p-8 rounded-xl text-white bg-gradient-to-r from-teal-500 to-cyan-600">
                             <i class="fas fa-video text-5xl mb-4"></i>
                             <span class="text-2xl font-bold">Lectures</span>
@@ -223,12 +227,17 @@
                             <span class="text-2xl font-bold">Question Bank</span>
                             <span class="font-light">Test Your Knowledge</span>
                         </button>
+                        <button id="osce-btn" class="main-menu-btn flex flex-col items-center justify-center p-8 rounded-xl text-white bg-gradient-to-r from-sky-500 to-blue-600">
+                            <i class="fas fa-user-md text-5xl mb-4"></i>
+                            <span class="text-2xl font-bold">OSCE Bank</span>
+                            <span class="font-light">Clinical Cases</span>
+                        </button>
                         <button id="library-btn" class="main-menu-btn flex flex-col items-center justify-center p-8 rounded-xl text-white bg-gradient-to-r from-orange-500 to-amber-600">
                             <i class="fas fa-book-bookmark text-5xl mb-4"></i>
                             <span class="text-2xl font-bold">Library</span>
                             <span class="font-light">View Resources</span>
                         </button>
-                        <button id="leaderboard-btn" class="main-menu-btn flex flex-col items-center justify-center p-8 rounded-xl text-white bg-gradient-to-r from-rose-500 to-pink-600">
+                        <button id="leaderboard-btn" class="main-menu-btn flex flex-col items-center justify-center p-8 rounded-xl text-white bg-gradient-to-r from-rose-500 to-pink-600 col-span-2 md:col-span-1">
                             <i class="fas fa-trophy text-5xl mb-4"></i>
                             <span class="text-2xl font-bold">Leaderboard</span>
                             <span class="font-light">Top 10 Users</span>
@@ -260,7 +269,7 @@
                 </div>
                 <div class="p-4 md:p-6">
                     <div id="leaderboard-loader" class="loader hidden"></div>
-                    <div id="current-user-rank" class="mb-6"></div> <!-- ADDED: Container for current user's rank -->
+                    <div id="current-user-rank" class="mb-6"></div> 
                     <div id="leaderboard-list" class="space-y-3">
                         <!-- Leaderboard will be injected here -->
                     </div>
@@ -331,6 +340,7 @@
                             <button id="browse-by-chapter-btn" class="action-btn w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">Browse by Chapter</button>
                             <button id="browse-by-source-btn" class="action-btn w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg">Browse by Source</button>
                         </div>
+                        <button id="practice-mistakes-btn" class="action-btn w-full mt-4 bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg">Practice Mistakes</button>
                     </div>
                 </div>
             </div>
@@ -522,6 +532,14 @@
                 <button id="clear-log-cancel-btn" class="action-btn bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancel</button>
             </div>
         </div>
+        <!-- ADDED: Announcements Modal -->
+        <div id="announcements-modal" class="bg-white rounded-lg p-6 shadow-xl max-w-lg w-full hidden">
+            <h3 class="text-xl font-bold mb-4">Latest Updates & Announcements</h3>
+            <div id="announcements-list" class="space-y-4 max-h-80 overflow-y-auto"></div>
+            <div class="flex justify-end mt-6">
+                <button id="announcements-close-btn" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Close</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -541,6 +559,7 @@
         let fullActivityLog = [];
         let activityChartInstance = null;
         let currentNote = { type: null, itemId: null, itemTitle: null };
+        let allAnnouncements = [];
 
         // --- DOM ELEMENTS ---
         const globalHeader = document.getElementById('global-header');
@@ -548,6 +567,7 @@
         const logoutBtn = document.getElementById('logout-btn');
         const activityLogBtn = document.getElementById('activity-log-btn');
         const notesBtn = document.getElementById('notes-btn');
+        const announcementsBtn = document.getElementById('announcements-btn');
         const userNameDisplay = document.getElementById('user-name-display');
         const loginContainer = document.getElementById('login-container');
         const mainMenuContainer = document.getElementById('main-menu-container');
@@ -579,7 +599,7 @@
         const leaderboardBackBtn = document.getElementById('leaderboard-back-btn');
         const leaderboardLoader = document.getElementById('leaderboard-loader');
         const leaderboardList = document.getElementById('leaderboard-list');
-        const currentUserRankDiv = document.getElementById('current-user-rank'); // ADDED
+        const currentUserRankDiv = document.getElementById('current-user-rank');
         const lecturesBackBtn = document.getElementById('lectures-back-btn');
         const lectureSearchInput = document.getElementById('lecture-search-input');
         const lecturesLoader = document.getElementById('lectures-loader');
@@ -618,6 +638,7 @@
         const mockError = document.getElementById('mock-error');
         const browseByChapterBtn = document.getElementById('browse-by-chapter-btn');
         const browseBySourceBtn = document.getElementById('browse-by-source-btn');
+        const practiceMistakesBtn = document.getElementById('practice-mistakes-btn');
         const listBackBtn = document.getElementById('list-back-btn');
         const listTitle = document.getElementById('list-title');
         const listItems = document.getElementById('list-items');
@@ -667,6 +688,9 @@
         const clearLectureLogsBtn = document.getElementById('clear-lecture-logs-btn');
         const clearAllLogsBtn = document.getElementById('clear-all-logs-btn');
         const clearLogCancelBtn = document.getElementById('clear-log-cancel-btn');
+        const announcementsModal = document.getElementById('announcements-modal');
+        const announcementsList = document.getElementById('announcements-list');
+        const announcementsCloseBtn = document.getElementById('announcements-close-btn');
 
         // --- QUIZ STATE ---
         let currentQuestionIndex = 0;
@@ -679,6 +703,7 @@
         let userAnswers = [];
         let modalConfirmAction = null;
         let isReviewMode = false;
+        let isPracticingMistakes = false;
         const DEFAULT_TIME_PER_QUESTION = 45;
         let currentQuizTimePerQuestion = DEFAULT_TIME_PER_QUESTION;
 
@@ -793,6 +818,7 @@
                 allQuestions = parseQuestions(data.questions);
                 groupedLectures = groupLecturesByChapter(data.lectures);
                 mcqBooks = data.books || [];
+                allAnnouncements = data.announcements || [];
                 
                 populateCustomExamOptions();
                 renderLectures();
@@ -915,6 +941,7 @@
         async function showMainMenuScreen() {
             showScreen(mainMenuContainer);
             navigationHistory = [showMainMenuScreen];
+            displayAnnouncement();
             await fetchAndShowLastActivity();
         }
         
@@ -1019,7 +1046,7 @@
         function renderBooks() {
             libraryList.innerHTML = '';
             if (mcqBooks.length === 0) {
-                libraryList.innerHTML = `<p class="text-slate-500 text-center">No books found in the library.</p>`;
+                libraryList.innerHTML = `<p class="text-center text-slate-500">No books found in the library.</p>`;
                 return;
             }
 
@@ -1489,8 +1516,9 @@
             launchQuiz(mockQuestions, "Custom Mock Exam", timePerQuestion);
         }
 
-        function launchQuiz(questions, title, timePerQuestion = DEFAULT_TIME_PER_QUESTION, reviewMode = false, pastAnswers = null) {
+        function launchQuiz(questions, title, timePerQuestion = DEFAULT_TIME_PER_QUESTION, reviewMode = false, pastAnswers = null, isMistakePractice = false) {
             isReviewMode = reviewMode;
+            isPracticingMistakes = isMistakePractice;
             showScreen(quizContainer);
             currentQuestionIndex = 0;
             score = 0;
@@ -1629,9 +1657,19 @@
             if (isReviewMode) return;
 
             clearInterval(timerInterval);
+            const currentQuestion = currentQuizQuestions[currentQuestionIndex];
+
             if(userAnswers[currentQuestionIndex] === null && selectedAnswer.isCorrect) {
                 score++;
+                if (isPracticingMistakes) {
+                    logCorrectedMistake(currentQuestion.UniqueID);
+                }
+            } else if (userAnswers[currentQuestionIndex] === null && !selectedAnswer.isCorrect) {
+                 if (!isPracticingMistakes) {
+                    logIncorrectAnswer(currentQuestion.UniqueID, selectedAnswer.text);
+                }
             }
+            
             userAnswers[currentQuestionIndex] = { answer: selectedAnswer.text, isCorrect: selectedAnswer.isCorrect };
             showAnswerResult();
             updateScoreBar();
@@ -1677,7 +1715,7 @@
                 reviewIncorrectBtn.classList.add('hidden');
             }
 
-            if (!isReviewMode) {
+            if (!isReviewMode && !isPracticingMistakes) {
                 logUserActivity({
                     eventType: 'FinishQuiz',
                     quizTitle: quizTitle.textContent,
@@ -2048,6 +2086,112 @@
             watermarkOverlay.appendChild(watermarkItem);
         }
 
+        async function startIncorrectQuestionsQuiz() {
+            loader.classList.remove('hidden');
+            loadingText.textContent = 'Loading your mistakes...';
+            loadingText.classList.remove('hidden');
+            try {
+                const response = await fetch(`${API_URL}?request=getIncorrectQuestions&userId=${currentUser.UniqueID}&t=${new Date().getTime()}`);
+                if (!response.ok) throw new Error('Failed to fetch your mistakes.');
+                
+                const data = await response.json();
+                if (data.error) throw new Error(data.error);
+
+                if (data.questions.length === 0) {
+                    showConfirmationModal('All Clear!', 'You have no incorrect questions to practice. Well done!', () => modalBackdrop.classList.add('hidden'));
+                    return;
+                }
+                
+                const mistakeQuestions = parseQuestions(data.questions);
+                const shuffled = [...mistakeQuestions].sort(() => Math.random() - 0.5);
+                launchQuiz(shuffled, "Practice Mistakes", DEFAULT_TIME_PER_QUESTION, false, null, true);
+
+            } catch (error) {
+                console.error("Error starting mistake practice:", error);
+                mockError.textContent = error.message;
+                mockError.classList.remove('hidden');
+            } finally {
+                loader.classList.add('hidden');
+                loadingText.classList.add('hidden');
+            }
+        }
+
+        function logIncorrectAnswer(questionId, userAnswer) {
+            const payload = {
+                eventType: 'logIncorrectAnswer',
+                userId: currentUser.UniqueID,
+                questionId: questionId,
+                userAnswer: userAnswer
+            };
+            fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
+                .catch(err => console.error("Failed to log incorrect answer:", err));
+        }
+
+        function logCorrectedMistake(questionId) {
+            const payload = {
+                eventType: 'logCorrectedMistake',
+                userId: currentUser.UniqueID,
+                questionId: questionId
+            };
+            fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
+                .catch(err => console.error("Failed to log corrected mistake:", err));
+        }
+
+        function displayAnnouncement() {
+            const banner = document.getElementById('announcement-banner');
+            if (allAnnouncements.length === 0) {
+                banner.classList.add('hidden');
+                return;
+            }
+
+            const latestAnnouncement = allAnnouncements[0];
+            const seenAnnouncementId = localStorage.getItem('seenAnnouncementId');
+            
+            if (seenAnnouncementId === latestAnnouncement.UniqueID) {
+                banner.classList.add('hidden');
+                return;
+            }
+
+            banner.innerHTML = `
+                <div class="mb-4 p-4 bg-indigo-100 border-l-4 border-indigo-500 text-indigo-700 rounded-lg relative">
+                    <div class="flex">
+                        <div class="py-1"><i class="fas fa-bullhorn fa-lg mr-4"></i></div>
+                        <div>
+                            <p class="font-bold">Latest Update</p>
+                            <p class="text-sm">${latestAnnouncement.UpdateMessage}</p>
+                        </div>
+                    </div>
+                    <button id="close-announcement-btn" class="absolute top-0 bottom-0 right-0 px-4 py-3">&times;</button>
+                </div>
+            `;
+            banner.classList.remove('hidden');
+
+            document.getElementById('close-announcement-btn').addEventListener('click', () => {
+                banner.classList.add('hidden');
+                localStorage.setItem('seenAnnouncementId', latestAnnouncement.UniqueID);
+            });
+        }
+        
+        function showAnnouncementsModal() {
+            announcementsList.innerHTML = '';
+            if (allAnnouncements.length === 0) {
+                announcementsList.innerHTML = `<p class="text-center text-slate-500">No announcements right now.</p>`;
+            } else {
+                allAnnouncements.forEach(ann => {
+                    const annItem = document.createElement('div');
+                    annItem.className = 'p-3 border-b';
+                    const date = new Date(ann.TimeStamp).toLocaleDateString('en-GB');
+                    annItem.innerHTML = `
+                        <p class="font-bold text-slate-700">${ann.UpdateMessage}</p>
+                        <p class="text-xs text-slate-400 text-right mt-1">${date}</p>
+                    `;
+                    announcementsList.appendChild(annItem);
+                });
+            }
+            modalBackdrop.classList.remove('hidden');
+            announcementsModal.classList.remove('hidden');
+        }
+
 
         // --- EVENT LISTENERS ---
         loginForm.addEventListener('submit', handleLogin);
@@ -2057,6 +2201,7 @@
         libraryBtn.addEventListener('click', showLibraryScreen);
         notesBtn.addEventListener('click', showNotesScreen);
         leaderboardBtn.addEventListener('click', showLeaderboardScreen);
+        announcementsBtn.addEventListener('click', showAnnouncementsModal);
         
         lecturesBackBtn.addEventListener('click', handleBackNavigation);
         qbankBackBtn.addEventListener('click', handleBackNavigation);
@@ -2090,6 +2235,7 @@
         browseByChapterBtn.addEventListener('click', () => showChapterList('All'));
         browseBySourceBtn.addEventListener('click', showSourceList);
         toggleCustomOptionsBtn.addEventListener('click', () => customExamOptions.classList.toggle('visible'));
+        practiceMistakesBtn.addEventListener('click', startIncorrectQuestionsQuiz);
 
         hintBtn.addEventListener('click', () => hintText.classList.remove('hidden'));
         flagBtn.addEventListener('click', toggleFlag);
@@ -2122,6 +2268,10 @@
             noteModal.classList.add('hidden');
         });
         noteSaveBtn.addEventListener('click', handleSaveNote);
+        announcementsCloseBtn.addEventListener('click', () => {
+            modalBackdrop.classList.add('hidden');
+            announcementsModal.classList.add('hidden');
+        });
         
         clearLogBtn.addEventListener('click', () => {
             modalBackdrop.classList.remove('hidden');
@@ -2142,5 +2292,3 @@
 
 </body>
 </html>
-
-
