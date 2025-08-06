@@ -1,18 +1,44 @@
+Of course\! I can help you with that. Creating a "Learning Mode" that displays questions and their answers directly is an excellent way to turn your question bank into a powerful study tool.
+
+Here is the plan:
+
+1.  **Create the HTML Structure:** We'll add a new `div` for the Learning Mode screen, which will be very similar to the existing `quiz-container`.
+2.  **Add the Main Menu Button Logic:** We'll make the "Learning Mode" button on the main menu functional.
+3.  **Implement the Core JavaScript:** We'll write the JavaScript functions to:
+      * Show and hide the new screen.
+      * Allow users to select which questions they want to study (e.g., by chapter or source, just like the Question Bank).
+      * Display one question at a time with the correct answer and rationale already visible.
+      * Include "Next" and "Previous" buttons to navigate through the questions.
+
+Let's get started\!
+
+### 1\. Updated HTML Code
+
+I've added the new HTML structure for the learning mode screen and the JavaScript to power it.
+
+**Key Changes:**
+
+  * **\`\`**: A new `div` with the ID \`learning-mode-container\` has been added. This container is a modified version of the \`quiz-container\`, designed to show the question and answer simultaneously.
+  * **New JavaScript Functions**:
+      * `showLearningModeBrowseScreen()`: This function displays the initial screen for the Learning Mode, allowing users to choose how they want to browse questions (similar to the question bank).
+      * `launchLearningMode()`: Starts the learning session with the selected questions.
+      * `showLearningQuestion()`: Renders a single question with its correct answer and rationale visible by default.
+  * **Event Listeners**: Added event listeners for the new buttons to make them functional.
+
+Copy and paste the entire code block below into your HTML file.
+
+```html
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plasticology Ultimate Edition</title>
-    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts for a clean look -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js for activity graph -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Custom styles */
@@ -123,24 +149,44 @@
             pointer-events: none;
             z-index: 1000;
         }
+        /* ADDED: Radio Banner Style */
+        #radio-banner-container.open {
+            max-height: 320px; /* h-64 (256px) for iframe + header */
+        }
+        /* ADDED: Styles for Learning Mode */
+        .learning-answer-btn {
+            background-color: #f3f4f6; /* bg-slate-100 */
+            border: 1px solid #d1d5db; /* border-slate-300 */
+        }
+        .learning-answer-btn.correct {
+            background-color: #d1fae5; /* bg-green-100 */
+            border-color: #10b981; /* border-green-500 */
+        }
+        .learning-rationale {
+            margin-top: 0.5rem;
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            color: #065f46; /* text-green-800 */
+            background-color: #d1fae5; /* bg-green-100 */
+        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-2 sm:p-4">
 
-    <!-- Main container for the entire app -->
     <div class="main-app-container">
-        <!-- ADDED: Watermark Overlay -->
         <div id="watermark-overlay" class="hidden">
-            <!-- Watermark items will be injected here by JS -->
-        </div>
+            </div>
 
-        <!-- Global header with fixed title and home button -->
         <header id="global-header" class="p-4 md:p-6 bg-slate-800 text-white flex justify-between items-center hidden">
             <a href="https://www.surgerymastersacademy.com" target="_blank" title="Back to Main Website">
                 <img id="header-logo" src="https://raw.githubusercontent.com/doctorbishoy/Plasticology-/main/Plasticology%202025%20Logo%20white%20outline.png" alt="Logo" class="h-10">
             </a>
             <div class="flex items-center gap-4">
                 <span id="user-name-display" class="text-base font-medium text-slate-200 hidden sm:block"></span>
+                <button id="radio-btn" class="text-white hover:text-slate-300 transition-colors text-2xl" title="Plasticology Radio" aria-label="Plasticology Radio">
+                    <i class="fas fa-broadcast-tower"></i>
+                </button>
                 <button id="announcements-btn" class="text-white hover:text-slate-300 transition-colors text-2xl" title="Announcements" aria-label="Announcements">
                     <i class="fas fa-bullhorn"></i>
                 </button>
@@ -160,9 +206,18 @@
             </div>
         </header>
 
-        <!-- Main content area where screens are swapped -->
+        <div id="radio-banner-container" class="max-h-0 overflow-hidden transition-all duration-500 ease-in-out bg-slate-100">
+            <div class="p-2 bg-slate-700 text-white flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-broadcast-tower"></i>
+                    <h4 class="font-bold text-sm">Plasticology Radio</h4>
+                </div>
+                <button id="radio-close-btn" class="text-xl hover:text-slate-300 px-2">&times;</button>
+            </div>
+            <iframe src="https://plasticologyradio.surgerymastersacademy.com/" class="w-full h-64 border-0" title="Plasticology Radio"></iframe>
+        </div>
+
         <main id="main-content">
-            <!-- Login Screen -->
             <div id="login-container" class="w-full max-w-md mx-auto">
                 <div class="p-8">
                     <a href="https://www.surgerymastersacademy.com" target="_blank" title="Go to Main Website">
@@ -174,39 +229,38 @@
                     <div id="login-loader" class="loader hidden"></div>
                     <p id="login-loading-text" class="text-center text-slate-500 hidden">Loading data for guests...</p>
                     <form id="login-form">
-                         <div class="mb-4">
-                             <label for="username" class="block text-slate-700 text-sm font-bold mb-2">Username</label>
-                             <input type="text" id="username" class="shadow appearance-none border rounded w-full py-2 px-3 text-slate-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                         </div>
-                         <div class="mb-6">
-                             <label for="password" class="block text-slate-700 text-sm font-bold mb-2">Password</label>
-                             <input type="password" id="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-slate-700 mb-3 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                         </div>
-                         <p id="login-error" class="text-red-500 text-xs italic mb-4 hidden">Invalid username or password.</p>
-                         <div class="flex flex-col gap-4">
-                             <button type="submit" id="login-submit-btn" class="action-btn w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline">
-                                 Log In
-                             </button>
-                             <div class="relative flex py-2 items-center">
+                        <div class="mb-4">
+                            <label for="username" class="block text-slate-700 text-sm font-bold mb-2">Username</label>
+                            <input type="text" id="username" class="shadow appearance-none border rounded w-full py-2 px-3 text-slate-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="mb-6">
+                            <label for="password" class="block text-slate-700 text-sm font-bold mb-2">Password</label>
+                            <input type="password" id="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-slate-700 mb-3 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <p id="login-error" class="text-red-500 text-xs italic mb-4 hidden">Invalid username or password.</p>
+                        <div class="flex flex-col gap-4">
+                            <button type="submit" id="login-submit-btn" class="action-btn w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline">
+                                Log In
+                            </button>
+                            <div class="relative flex py-2 items-center">
                                 <div class="flex-grow border-t border-gray-300"></div>
                                 <span class="flex-shrink mx-4 text-gray-400 text-sm">OR</span>
                                 <div class="flex-grow border-t border-gray-300"></div>
                             </div>
-                             <button type="button" id="free-test-btn" class="action-btn w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline">
+                            <button type="button" id="free-test-btn" class="action-btn w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline">
                                 <i class="fas fa-vial mr-2"></i> Try a Free Test
-                             </button>
-                             <a href="https://www.youtube.com/playlist?list=PLVUDV5bqFz4jabLMYet03YmJknm8jA-wG" target="_blank" class="action-btn text-center w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline">
+                            </button>
+                            <a href="https://www.youtube.com/playlist?list=PLVUDV5bqFz4jabLMYet03YmJknm8jA-wG" target="_blank" class="action-btn text-center w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline">
                                 <i class="fab fa-youtube mr-2"></i> Watch Sample Lectures
-                             </a>
-                              <a href="https://t.me/DrBishoyAcademy" target="_blank" class="action-btn text-center w-full mt-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline">
+                            </a>
+                             <a href="https://t.me/DrBishoyAcademy" target="_blank" class="action-btn text-center w-full mt-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline">
                                 <i class="fab fa-telegram-plane mr-2"></i> Subscribe now for Ultimate Edition
-                             </a>
-                         </div>
+                            </a>
+                        </div>
                     </form>
                 </div>
             </div>
             
-            <!-- Main Menu Screen -->
             <div id="main-menu-container" class="w-full hidden">
                 <div class="p-6 md:p-8">
                     <div id="announcement-banner" class="hidden"></div>
@@ -237,22 +291,25 @@
                             <span class="text-2xl font-bold">Library</span>
                             <span class="font-light">View Resources</span>
                         </button>
-                        <button id="leaderboard-btn" class="main-menu-btn flex flex-col items-center justify-center p-8 rounded-xl text-white bg-gradient-to-r from-rose-500 to-pink-600 col-span-2 md:col-span-1">
+                        <button id="leaderboard-btn" class="main-menu-btn flex flex-col items-center justify-center p-8 rounded-xl text-white bg-gradient-to-r from-rose-500 to-pink-600">
                             <i class="fas fa-trophy text-5xl mb-4"></i>
                             <span class="text-2xl font-bold">Leaderboard</span>
                             <span class="font-light">Top 10 Users</span>
+                        </button>
+                        <button id="learning-mode-btn" class="main-menu-btn flex flex-col items-center justify-center p-8 rounded-xl text-white bg-gradient-to-r from-green-500 to-emerald-600">
+                            <i class="fas fa-book-reader text-5xl mb-4"></i>
+                            <span class="text-2xl font-bold">Learning Mode</span>
+                            <span class="font-light">Study Questions</span>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Library Screen -->
             <div id="library-container" class="w-full hidden">
                 <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
                     <button id="library-back-btn" class="text-slate-700 hover:text-blue-600 transition-colors" title="Back"><i class="fas fa-arrow-left"></i> Back</button>
                     <h2 class="text-xl md:text-2xl font-bold text-slate-800">Resource Library</h2>
-                    <div class="w-16"></div> <!-- Spacer -->
-                </div>
+                    <div class="w-16"></div> </div>
                 <div class="p-4 md:p-6">
                     <div id="library-loader" class="loader hidden"></div>
                     <div id="library-list" class="space-y-4">
@@ -260,29 +317,24 @@
                 </div>
             </div>
 
-            <!-- Leaderboard Screen -->
             <div id="leaderboard-container" class="w-full hidden">
                 <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
                     <button id="leaderboard-back-btn" class="text-slate-700 hover:text-blue-600 transition-colors" title="Back"><i class="fas fa-arrow-left"></i> Back</button>
                     <h2 class="text-xl md:text-2xl font-bold text-slate-800">Top 10 Champions</h2>
-                    <div class="w-16"></div> <!-- Spacer -->
-                </div>
+                    <div class="w-16"></div> </div>
                 <div class="p-4 md:p-6">
                     <div id="leaderboard-loader" class="loader hidden"></div>
                     <div id="current-user-rank" class="mb-6"></div> 
                     <div id="leaderboard-list" class="space-y-3">
-                        <!-- Leaderboard will be injected here -->
-                    </div>
+                        </div>
                 </div>
             </div>
 
-            <!-- Lectures Screen -->
             <div id="lectures-container" class="w-full hidden">
                 <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
                     <button id="lectures-back-btn" class="text-slate-700 hover:text-blue-600 transition-colors" title="Back"><i class="fas fa-arrow-left"></i> Back</button>
                     <h2 class="text-xl md:text-2xl font-bold text-slate-800">Lectures</h2>
-                    <div class="w-16"></div> <!-- Spacer -->
-                </div>
+                    <div class="w-16"></div> </div>
                 <div class="p-4 md:p-6">
                     <div class="relative mb-6">
                         <input type="text" id="lecture-search-input" placeholder="Search by chapter or topic..." class="w-full p-3 pl-10 border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
@@ -294,13 +346,11 @@
                 </div>
             </div>
 
-            <!-- Question Bank Home Screen -->
             <div id="qbank-container" class="w-full hidden">
                  <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
                     <button id="qbank-back-btn" class="text-slate-700 hover:text-blue-600 transition-colors" title="Back"><i class="fas fa-arrow-left"></i> Back</button>
                     <h2 class="text-xl md:text-2xl font-bold text-slate-800">Question Bank</h2>
-                    <div class="w-16"></div> <!-- Spacer -->
-                </div>
+                    <div class="w-16"></div> </div>
                 <div id="qbank-controls">
                     <div class="p-6 md:p-8 border-b border-slate-200">
                         <div id="loader" class="loader hidden"></div>
@@ -345,23 +395,102 @@
                 </div>
             </div>
             
-            <!-- List Screen (for Chapters or Sources) -->
+            <div id="osce-container" class="w-full hidden">
+                <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
+                    <button id="osce-back-btn" class="text-slate-700 hover:text-blue-600 transition-colors" title="Back"><i class="fas fa-arrow-left"></i> Back</button>
+                    <h2 class="text-xl md:text-2xl font-bold text-slate-800">OSCE Bank</h2>
+                    <div class="w-16"></div> </div>
+                <div id="osce-controls">
+                    <div class="p-6 md:p-8 border-b border-slate-200">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-2 text-center">OSCE Slayer</h3>
+                        <p class="text-center text-slate-500 mb-4">Test yourself in all available clinical cases.</p>
+                        <button id="start-osce-slayer-btn" class="action-btn w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 px-4 rounded-lg">
+                            Start OSCE Slayer
+                        </button>
+                    </div>
+                    <div class="p-6 md:p-8">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4 text-center">Custom OSCE</h3>
+                        <div class="flex flex-col sm:flex-row items-center gap-4">
+                            <input type="number" id="osce-case-count" class="shadow appearance-none border rounded w-full sm:w-1/2 py-2 px-3 text-slate-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="# of Cases" min="1">
+                            <input type="number" id="osce-time-per-q" class="shadow appearance-none border rounded w-full sm:w-1/2 py-2 px-3 text-slate-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Mins/Question (Default: 1)" min="1">
+                            <button id="toggle-osce-options-btn" class="action-btn w-full sm:w-auto bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg">
+                                Customize
+                            </button>
+                        </div>
+                        <div id="custom-osce-options" class="custom-exam-options mt-4">
+                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                 <div>
+                                     <label for="chapter-select-osce" class="block text-sm font-medium text-slate-700 mb-2">Filter by Chapters (optional)</label>
+                                     <div id="chapter-select-osce" class="filter-container space-y-2">
+                                         <p class="text-slate-400">Loading chapters...</p>
+                                     </div>
+                                 </div>
+                                 <div>
+                                     <label for="source-select-osce" class="block text-sm font-medium text-slate-700 mb-2">Filter by Sources (optional)</label>
+                                     <div id="source-select-osce" class="filter-container space-y-2">
+                                         <p class="text-slate-400">Loading sources...</p>
+                                     </div>
+                                 </div>
+                             </div>
+                        </div>
+                        <button id="start-custom-osce-btn" class="action-btn w-full mt-6 bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-4 rounded-lg">
+                            Start Custom OSCE
+                        </button>
+                        <p id="osce-error" class="text-red-500 text-xs italic mt-2 hidden"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="osce-quiz-container" class="w-full hidden flex flex-col h-full">
+                 <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center flex-shrink-0">
+                    <div class="flex items-center gap-4">
+                        <button id="end-osce-quiz-btn" class="text-slate-600 hover:text-red-600 transition-colors text-2xl" title="End OSCE Quiz" aria-label="End OSCE Quiz"><i class="fas fa-stop-circle"></i></button>
+                    </div>
+                    <h2 id="osce-quiz-title" class="text-lg md:text-xl font-bold text-slate-800 text-center mx-2 truncate"></h2>
+                    <div class="flex items-center gap-4">
+                        <div id="osce-score" class="text-lg font-mono bg-blue-200 text-blue-800 px-3 py-1 rounded-md">Score: 0/0</div>
+                        <div id="osce-timer" class="text-lg font-mono bg-slate-200 text-slate-800 px-3 py-1 rounded-md">--:--</div>
+                    </div>
+                </div>
+                <div class="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4 p-4 overflow-y-auto">
+                    <div class="bg-slate-50 p-4 rounded-lg flex flex-col">
+                        <h3 id="osce-case-title" class="text-xl font-bold text-slate-800 mb-2"></h3>
+                        <div id="osce-case-image-container" class="mb-2 text-center flex-grow flex items-center justify-center">
+                             </div>
+                        <p id="osce-case-description" class="text-sm text-slate-600"></p>
+                    </div>
+                    <div class="flex flex-col">
+                        <p id="osce-progress-text" class="font-semibold text-slate-600 text-center mb-2"></p>
+                        <div class="bg-white p-4 rounded-lg border flex-grow flex flex-col">
+                            <div id="osce-question-image-container" class="mb-4 text-center"></div>
+                            <h3 id="osce-question-text" class="text-lg font-semibold text-slate-800 mb-4"></h3>
+                            <div id="osce-answer-area" class="space-y-3 flex-grow">
+                                </div>
+                            <div id="osce-model-answer-area" class="mt-4 hidden p-3 bg-gray-100 rounded"></div>
+                            <div id="osce-self-correction-area" class="mt-4 hidden"></div>
+                            <div id="osce-controls-container" class="mt-4 flex justify-between items-center">
+                                <button id="osce-previous-btn" class="action-btn bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded-lg hover:bg-slate-400">Previous</button>
+                                <button id="osce-navigator-btn" class="text-2xl text-slate-500 hover:text-blue-600 transition-colors" title="Case & Question Navigator" aria-label="Case & Question Navigator"><i class="fas fa-th-list"></i></button>
+                                <button id="osce-next-btn" class="action-btn bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700">Next</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div id="list-container" class="w-full hidden">
                  <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
                     <button id="list-back-btn" class="text-slate-700 hover:text-blue-600 transition-colors" title="Back"><i class="fas fa-arrow-left"></i> Back</button>
                     <h2 id="list-title" class="text-xl md:text-2xl font-bold text-slate-800"></h2>
-                    <div class="w-16"></div> <!-- Spacer -->
-                </div>
+                    <div class="w-16"></div> </div>
                 <div id="list-items" class="p-4 md:p-6 grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4"></div>
             </div>
 
-            <!-- My Notes Screen -->
             <div id="notes-container" class="w-full hidden">
                 <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
                     <button id="notes-back-btn" class="text-slate-700 hover:text-blue-600 transition-colors" title="Back"><i class="fas fa-arrow-left"></i> Back</button>
                     <h2 class="text-xl md:text-2xl font-bold text-slate-800">My Notes</h2>
-                    <div class="w-16"></div> <!-- Spacer -->
-                </div>
+                    <div class="w-16"></div> </div>
                 <div class="p-6 md:p-8">
                     <div class="mb-4 p-1 bg-slate-200 rounded-lg flex justify-center gap-1">
                         <button id="notes-filter-quizzes" class="filter-btn flex-1 py-2 px-4 rounded-md text-sm font-semibold transition-colors">Quiz Notes</button>
@@ -372,7 +501,6 @@
                 </div>
             </div>
 
-            <!-- Activity Log Screen -->
             <div id="activity-log-container" class="w-full hidden">
                 <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
                     <button id="activity-back-btn" class="text-slate-700 hover:text-blue-600 transition-colors" title="Back"><i class="fas fa-arrow-left"></i> Back</button>
@@ -387,7 +515,7 @@
                     </div>
                     
                     <div id="all-summary" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 hidden">
-                         <div class="bg-teal-100 p-4 rounded-lg text-center">
+                        <div class="bg-teal-100 p-4 rounded-lg text-center">
                             <p class="text-sm text-teal-800 font-semibold">Lectures Progress</p>
                             <p id="all-lectures-progress" class="text-2xl font-bold text-teal-900"></p>
                         </div>
@@ -413,7 +541,7 @@
                     </div>
 
                     <div id="lecture-summary" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 hidden">
-                         <div class="bg-indigo-100 p-4 rounded-lg text-center">
+                        <div class="bg-indigo-100 p-4 rounded-lg text-center">
                             <p class="text-sm text-indigo-800 font-semibold">Lectures Viewed</p>
                             <p id="lectures-viewed-count" class="text-2xl font-bold text-indigo-900"></p>
                         </div>
@@ -432,13 +560,12 @@
                 </div>
             </div>
 
-            <!-- Quiz Screen -->
             <div id="quiz-container" class="w-full hidden">
                  <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
                     <div class="flex items-center gap-4">
                         <button id="end-quiz-btn" class="text-slate-600 hover:text-red-600 transition-colors text-2xl" title="End Quiz" aria-label="End Quiz"><i class="fas fa-stop-circle"></i></button>
                     </div>
-                    <h2 id="quiz-title" class="text-lg md:text-xl font-bold text-slate-800 text-center mx-2 truncate"></h2>
+                    <h2 id="quiz-title" class="text-lg md:text-2xl font-bold text-slate-800 text-center mx-2 truncate"></h2>
                     <div id="timer" class="text-lg font-mono bg-slate-200 text-slate-800 px-3 py-1 rounded-md">00:00</div>
                 </div>
                 <div class="px-6 md:px-8 pt-6">
@@ -475,8 +602,8 @@
                     </div>
                     <div id="hint-text" class="p-3 bg-yellow-100 border-l-4 border-yellow-400 text-yellow-800 rounded-md w-full text-center mt-4 hidden"></div>
                     <div id="results-container" class="hidden text-center p-6">
-                        <h2 class="text-3xl font-bold text-slate-800">Quiz Complete!</h2>
-                        <p class="text-xl mt-4">Your score is <span id="score-text" class="font-bold"></span> out of <span id="total-questions" class="font-bold"></span>.</p>
+                        <h2 id="results-title" class="text-3xl font-bold text-slate-800">Quiz Complete!</h2>
+                        <p id="results-score-text" class="text-xl mt-4">Your score is <span id="score-text" class="font-bold"></span> out of <span id="total-questions" class="font-bold"></span>.</p>
                         <div id="results-buttons" class="mt-8 flex flex-wrap justify-center gap-4">
                             <button id="results-home-btn" class="action-btn bg-gray-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-700">Go to Home</button>
                             <button id="restart-btn" class="action-btn bg-slate-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-slate-900">Restart Quiz</button>
@@ -485,13 +612,51 @@
                     </div>
                 </div>
             </div>
+
+            <div id="learning-mode-container" class="w-full hidden">
+                <div id="learning-mode-controls">
+                    <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
+                        <button id="learning-mode-back-btn" class="text-slate-700 hover:text-blue-600 transition-colors" title="Back"><i class="fas fa-arrow-left"></i> Back</button>
+                        <h2 class="text-xl md:text-2xl font-bold text-slate-800">Learning Mode</h2>
+                        <div class="w-16"></div> </div>
+                    <div class="p-6 md:p-8">
+                        <h3 class="text-xl font-bold text-slate-800 mb-4 text-center">Browse Questions to Study</h3>
+                         <p class="text-center text-slate-500 mb-6">Select a category to start learning. Questions will be displayed with their answers.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <button id="learning-browse-by-chapter-btn" class="action-btn w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">Browse by Chapter</button>
+                            <button id="learning-browse-by-source-btn" class="action-btn w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg">Browse by Source</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="learning-mode-viewer" class="hidden">
+                     <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
+                        <button id="end-learning-btn" class="text-slate-600 hover:text-red-600 transition-colors" title="End Session"><i class="fas fa-stop-circle text-2xl"></i></button>
+                        <h2 id="learning-title" class="text-lg md:text-2xl font-bold text-slate-800 text-center mx-2 truncate"></h2>
+                        <div class="w-16"></div> </div>
+                    <div class="p-6 md:p-8">
+                         <div class="text-center mb-4">
+                            <p id="learning-progress-text" class="font-semibold text-slate-600">Loading question...</p>
+                            <p id="learning-source-text" class="text-sm text-slate-400 mt-1"></p>
+                        </div>
+                        <div id="learning-image-container" class="mb-4 text-center"></div>
+                        <div>
+                            <h2 id="learning-question-text" class="text-xl md:text-2xl font-semibold text-slate-800 mb-6 leading-relaxed"></h2>
+                            <div id="learning-answer-buttons" class="space-y-4"></div>
+                        </div>
+                        <div class="mt-8 flex justify-between items-center">
+                            <button id="learning-previous-btn" class="bg-slate-300 text-slate-800 font-bold py-3 px-6 rounded-lg hover:bg-slate-400 transition-colors action-btn">Previous</button>
+                            <button id="learning-next-btn" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition-colors action-btn">Next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </main>
         <footer id="app-footer" class="text-center p-4 bg-slate-100 text-xs text-slate-500 border-t">
             Copyright © Egyptian Plastic Surgery Academy Plasticology Dr.Bishoy
         </footer>
     </div>
 
-    <!-- Modals (Navigator, Confirmation, Image Viewer, Note) -->
     <div id="modal-backdrop" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
         <div id="confirmation-modal" class="bg-white rounded-lg p-8 shadow-xl max-w-sm w-full hidden">
             <h3 id="modal-title" class="text-xl font-bold mb-4">Are you sure?</h3>
@@ -506,6 +671,13 @@
             <div id="navigator-grid" class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2 max-h-64 overflow-y-auto"></div>
             <div class="flex justify-end mt-6">
                 <button id="navigator-close-btn" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Close</button>
+            </div>
+        </div>
+        <div id="osce-navigator-modal" class="bg-white rounded-lg p-6 shadow-xl max-w-lg w-full hidden">
+            <h3 class="text-xl font-bold mb-4">Case & Question Navigator</h3>
+            <div id="osce-navigator-content" class="space-y-2 max-h-80 overflow-y-auto"></div>
+            <div class="flex justify-end mt-6">
+                <button id="osce-navigator-close-btn" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Close</button>
             </div>
         </div>
         <div id="image-viewer-modal" class="bg-white rounded-lg p-4 shadow-xl max-w-4xl w-full hidden relative">
@@ -532,7 +704,6 @@
                 <button id="clear-log-cancel-btn" class="action-btn bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancel</button>
             </div>
         </div>
-        <!-- ADDED: Announcements Modal -->
         <div id="announcements-modal" class="bg-white rounded-lg p-6 shadow-xl max-w-lg w-full hidden">
             <h3 class="text-xl font-bold mb-4">Latest Updates & Announcements</h3>
             <div id="announcements-list" class="space-y-4 max-h-80 overflow-y-auto"></div>
@@ -540,26 +711,73 @@
                 <button id="announcements-close-btn" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Close</button>
             </div>
         </div>
-    </div>
+        </div>
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         // --- URL FOR GOOGLE SHEETS ---
         const API_URL = 'https://script.google.com/macros/s/AKfycbzx8gRgbYZw8Rrg348q2dlsRd7yQ9IXUNUPBDUf-Q5Wb9LntLuKY-ozmnbZOOuQsDU_3w/exec';
         
-        // --- APP DATA ---
-        let allQuestions = [];
-        let groupedLectures = {};
-        let mcqBooks = [];
-        let userQuizNotes = [];
-        let userLectureNotes = [];
-        let navigationHistory = [];
-        let currentUser = null;
-        let viewedLectures = new Set();
-        let fullActivityLog = [];
-        let activityChartInstance = null;
-        let currentNote = { type: null, itemId: null, itemTitle: null };
-        let allAnnouncements = [];
+        // --- REFACTORED: Centralized Application State ---
+        const appState = {
+            // Content Data
+            allQuestions: [],
+            allOsceCases: [],
+            allOsceQuestions: [],
+            groupedLectures: {},
+            mcqBooks: [],
+            allAnnouncements: [],
+            
+            // User Data
+            currentUser: null,
+            viewedLectures: new Set(),
+            fullActivityLog: [],
+            userQuizNotes: [],
+            userLectureNotes: [],
+
+            // Navigation
+            navigationHistory: [],
+
+            // Current Quiz State
+            currentQuiz: {
+                questions: [],
+                originalQuestions: [],
+                userAnswers: [],
+                originalUserAnswers: [],
+                currentQuestionIndex: 0,
+                score: 0,
+                timerInterval: null,
+                flaggedIndices: new Set(),
+                isReviewMode: false,
+                isPracticingMistakes: false,
+                timePerQuestion: 45, // Default time
+            },
+
+            // Current OSCE State
+            currentOsce: {
+                cases: [],
+                caseIndex: 0,
+                questionIndex: 0,
+                timerInterval: null,
+                userAnswers: {},
+                score: 0,
+                totalQuestions: 0,
+            },
+            
+            // ADDED: Current Learning Mode State
+            currentLearning: {
+                questions: [],
+                currentIndex: 0,
+                title: ''
+            },
+
+            // UI State
+            activityChartInstance: null,
+            currentNote: { type: null, itemId: null, itemTitle: null },
+            modalConfirmAction: null,
+        };
+        
+        const DEFAULT_TIME_PER_QUESTION = 45;
 
         // --- DOM ELEMENTS ---
         const globalHeader = document.getElementById('global-header');
@@ -662,6 +880,8 @@
         const scoreBarCorrect = document.getElementById('score-bar-correct');
         const scoreBarIncorrect = document.getElementById('score-bar-incorrect');
         const resultsContainer = document.getElementById('results-container');
+        const resultsTitle = document.getElementById('results-title');
+        const resultsScoreText = document.getElementById('results-score-text');
         const scoreText = document.getElementById('score-text');
         const totalQuestionsSpan = document.getElementById('total-questions');
         const restartBtn = document.getElementById('restart-btn');
@@ -691,40 +911,80 @@
         const announcementsModal = document.getElementById('announcements-modal');
         const announcementsList = document.getElementById('announcements-list');
         const announcementsCloseBtn = document.getElementById('announcements-close-btn');
+        const osceBtn = document.getElementById('osce-btn');
+        const osceContainer = document.getElementById('osce-container');
+        const osceQuizContainer = document.getElementById('osce-quiz-container');
+        const osceBackBtn = document.getElementById('osce-back-btn');
+        const startOsceSlayerBtn = document.getElementById('start-osce-slayer-btn');
+        const osceCaseCountInput = document.getElementById('osce-case-count');
+        const osceTimePerQInput = document.getElementById('osce-time-per-q');
+        const toggleOsceOptionsBtn = document.getElementById('toggle-osce-options-btn');
+        const customOsceOptions = document.getElementById('custom-osce-options');
+        const chapterSelectOsce = document.getElementById('chapter-select-osce');
+        const sourceSelectOsce = document.getElementById('source-select-osce');
+        const startCustomOsceBtn = document.getElementById('start-custom-osce-btn');
+        const osceError = document.getElementById('osce-error');
+        const endOsceQuizBtn = document.getElementById('end-osce-quiz-btn');
+        const osceQuizTitle = document.getElementById('osce-quiz-title');
+        const osceTimer = document.getElementById('osce-timer');
+        const osceCaseTitle = document.getElementById('osce-case-title');
+        const osceCaseImageContainer = document.getElementById('osce-case-image-container');
+        const osceCaseDescription = document.getElementById('osce-case-description');
+        const osceProgressText = document.getElementById('osce-progress-text');
+        const osceQuestionImageContainer = document.getElementById('osce-question-image-container');
+        const osceQuestionText = document.getElementById('osce-question-text');
+        const osceAnswerArea = document.getElementById('osce-answer-area');
+        const osceModelAnswerArea = document.getElementById('osce-model-answer-area');
+        const oscePreviousBtn = document.getElementById('osce-previous-btn');
+        const osceNextBtn = document.getElementById('osce-next-btn');
+        const radioBtn = document.getElementById('radio-btn');
+        const radioCloseBtn = document.getElementById('radio-close-btn');
+        const osceScoreDisplay = document.getElementById('osce-score');
+        const osceNavigatorBtn = document.getElementById('osce-navigator-btn');
+        const osceNavigatorModal = document.getElementById('osce-navigator-modal');
+        const osceNavigatorContent = document.getElementById('osce-navigator-content');
+        const osceNavigatorCloseBtn = document.getElementById('osce-navigator-close-btn');
+        const osceSelfCorrectionArea = document.getElementById('osce-self-correction-area');
+        // ADDED: Radio Banner Element
+        const radioBannerContainer = document.getElementById('radio-banner-container');
+        
+        // --- ADDED: Learning Mode Elements ---
+        const learningModeBtn = document.getElementById('learning-mode-btn');
+        const learningModeContainer = document.getElementById('learning-mode-container');
+        const learningModeControls = document.getElementById('learning-mode-controls');
+        const learningModeViewer = document.getElementById('learning-mode-viewer');
+        const learningModeBackBtn = document.getElementById('learning-mode-back-btn');
+        const learningBrowseByChapterBtn = document.getElementById('learning-browse-by-chapter-btn');
+        const learningBrowseBySourceBtn = document.getElementById('learning-browse-by-source-btn');
+        const endLearningBtn = document.getElementById('end-learning-btn');
+        const learningTitle = document.getElementById('learning-title');
+        const learningProgressText = document.getElementById('learning-progress-text');
+        const learningSourceText = document.getElementById('learning-source-text');
+        const learningImageContainer = document.getElementById('learning-image-container');
+        const learningQuestionText = document.getElementById('learning-question-text');
+        const learningAnswerButtons = document.getElementById('learning-answer-buttons');
+        const learningPreviousBtn = document.getElementById('learning-previous-btn');
+        const learningNextBtn = document.getElementById('learning-next-btn');
 
-        // --- QUIZ STATE ---
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let currentQuizQuestions = [];
-        let originalQuizQuestions = [];
-        let originalUserAnswers = [];
-        let timerInterval;
-        let flaggedIndices = new Set();
-        let userAnswers = [];
-        let modalConfirmAction = null;
-        let isReviewMode = false;
-        let isPracticingMistakes = false;
-        const DEFAULT_TIME_PER_QUESTION = 45;
-        let currentQuizTimePerQuestion = DEFAULT_TIME_PER_QUESTION;
 
         // --- FUNCTIONS ---
 
         function logUserActivity(eventData) {
-            if (!API_URL || !currentUser || currentUser.Role === 'Guest') return;
+            if (!API_URL || !appState.currentUser || appState.currentUser.Role === 'Guest') return;
             
             const now = new Date();
             let newLogEntry = null;
             const payload = { 
                 ...eventData,
-                userId: currentUser.UniqueID,
-                userName: currentUser.Name
+                userId: appState.currentUser.UniqueID,
+                userName: appState.currentUser.Name
             }; 
 
             if (payload.eventType === 'FinishQuiz') {
-                const details = originalQuizQuestions.map((q, index) => {
+                const details = appState.currentQuiz.originalQuestions.map((q, index) => {
                     return {
                         qID: q.UniqueID,
-                        ans: originalUserAnswers[index] ? originalUserAnswers[index].answer : 'No Answer'
+                        ans: appState.currentQuiz.originalUserAnswers[index] ? appState.currentQuiz.originalUserAnswers[index].answer : 'No Answer'
                     };
                 });
                 payload.details = JSON.stringify(details);
@@ -746,7 +1006,7 @@
                 body: JSON.stringify(payload)
             }).then(() => {
                 if (newLogEntry) {
-                    fullActivityLog.unshift(newLogEntry);
+                    appState.fullActivityLog.unshift(newLogEntry);
                 }
             }).catch(error => console.error('Error logging activity:', error));
         }
@@ -800,6 +1060,42 @@
             return chapters;
         }
 
+        function parseOsceCases(data) {
+            if (!data) return [];
+            return data.filter(row => row.CaseID && row.Title).map(row => ({
+                CaseID: row.CaseID,
+                Title: row.Title,
+                ImageURL: row.ImageURL,
+                Hint: row.Hint,
+                CaseDescription: row.CaseDescription,
+                AudioURL: row.AudioURL,
+                Chapter: row.Chapter,
+                Source: row.Source
+            }));
+        }
+
+        function parseOsceQuestions(data) {
+            if (!data) return [];
+            return data.filter(row => row.QuestionID && row.CaseID).map(row => {
+                const answerOptions = [];
+                 if (row.CorrectAnswer && String(row.CorrectAnswer).trim() !== '') answerOptions.push({ text: String(row.CorrectAnswer), isCorrect: true, rationale: row.CorrectRationale || '' });
+                if (row.IncorrectAnswer1 && String(row.IncorrectAnswer1).trim() !== '') answerOptions.push({ text: String(row.IncorrectAnswer1), isCorrect: false, rationale: row.IncorrectRationale1 || '' });
+                if (row.IncorrectAnswer2 && String(row.IncorrectAnswer2).trim() !== '') answerOptions.push({ text: String(row.IncorrectAnswer2), isCorrect: false, rationale: row.IncorrectRationale2 || '' });
+                if (row.IncorrectAnswer3 && String(row.IncorrectAnswer3).trim() !== '') answerOptions.push({ text: String(row.IncorrectAnswer3), isCorrect: false, rationale: row.IncorrectRationale3 || '' });
+
+                return {
+                    QuestionID: row.QuestionID,
+                    CaseID: row.CaseID,
+                    QuestionType: row.QuestionType,
+                    QuestionText: row.QuestionText,
+                    EssayModelAnswer: row.EssayModelAnswer,
+                    ImageURL: row.ImageURL,
+                    AudioURL: row.AudioURL,
+                    answerOptions: answerOptions
+                };
+            });
+        }
+
         async function loadContentData() {
             loginLoader.classList.remove('hidden');
             loginLoadingText.classList.remove('hidden');
@@ -815,12 +1111,14 @@
                 const data = await response.json();
                 if (data.error) throw new Error(data.error);
 
-                allQuestions = parseQuestions(data.questions);
-                groupedLectures = groupLecturesByChapter(data.lectures);
-                mcqBooks = data.books || [];
-                allAnnouncements = data.announcements || [];
+                appState.allQuestions = parseQuestions(data.questions);
+                appState.groupedLectures = groupLecturesByChapter(data.lectures);
+                appState.mcqBooks = data.books || [];
+                appState.allAnnouncements = data.announcements || [];
+                appState.allOsceCases = parseOsceCases(data.osceCases);
+                appState.allOsceQuestions = parseOsceQuestions(data.osceQuestions);
                 
-                populateCustomExamOptions();
+                populateAllFilterOptions();
                 renderLectures();
                 
                 loginLoader.classList.add('hidden');
@@ -833,39 +1131,49 @@
         }
 
         async function loadUserData() {
-            if (!currentUser || currentUser.Role === 'Guest') return;
+            if (!appState.currentUser || appState.currentUser.Role === 'Guest') return;
             try {
-                const response = await fetch(`${API_URL}?request=userData&userId=${currentUser.UniqueID}&t=${new Date().getTime()}`);
+                const response = await fetch(`${API_URL}?request=userData&userId=${appState.currentUser.UniqueID}&t=${new Date().getTime()}`);
                 if (!response.ok) throw new Error('Could not fetch user data.');
                 
                 const data = await response.json();
                 if (data.error) throw new Error(data.error);
                 
-                fullActivityLog = data.logs || [];
-                userQuizNotes = data.quizNotes || [];
-                userLectureNotes = data.lectureNotes || [];
+                appState.fullActivityLog = data.logs || [];
+                appState.userQuizNotes = data.quizNotes || [];
+                appState.userLectureNotes = data.lectureNotes || [];
             } catch (error) {
                 console.error('Error loading user data:', error);
             }
         }
 
-        function populateCustomExamOptions() {
-            const chapters = [...new Set(allQuestions.map(q => q.chapter))].sort();
-            const sources = [...new Set(allQuestions.map(q => q.source).filter(s => s))].sort();
-            chapterSelectMock.innerHTML = '';
-            sourceSelectMock.innerHTML = '';
-            chapters.forEach(chapter => {
+        // --- REFACTORED: Reusable function to populate filter options ---
+        function populateFilterOptions(containerElement, items, inputNamePrefix) {
+            containerElement.innerHTML = '';
+            if (!items || items.length === 0) {
+                containerElement.innerHTML = `<p class="text-slate-400 text-sm">No options available.</p>`;
+                return;
+            }
+
+            items.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'flex items-center';
-                div.innerHTML = `<input id="chapter-${chapter.replace(/\s+/g, '-')}" name="chapter" value="${chapter}" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"><label for="chapter-${chapter.replace(/\s+/g, '-')}" class="ml-3 text-sm text-gray-600">${chapter}</label>`;
-                chapterSelectMock.appendChild(div);
+                const safeId = `${inputNamePrefix}-${item.replace(/[^a-zA-Z0-9]/g, '-')}`;
+                div.innerHTML = `<input id="${safeId}" name="${inputNamePrefix}" value="${item}" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"><label for="${safeId}" class="ml-3 text-sm text-gray-600">${item}</label>`;
+                containerElement.appendChild(div);
             });
-            sources.forEach(source => {
-                const div = document.createElement('div');
-                div.className = 'flex items-center';
-                div.innerHTML = `<input id="source-${source.replace(/\s+/g, '-')}" name="source" value="${source}" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"><label for="source-${source.replace(/\s+/g, '-')}" class="ml-3 text-sm text-gray-600">${source}</label>`;
-                sourceSelectMock.appendChild(div);
-            });
+        }
+
+        function populateAllFilterOptions() {
+            const mcqChapters = [...new Set(appState.allQuestions.map(q => q.chapter))].sort();
+            const mcqSources = [...new Set(appState.allQuestions.map(q => q.source).filter(s => s))].sort();
+            populateFilterOptions(chapterSelectMock, mcqChapters, 'mock-chapter');
+            populateFilterOptions(sourceSelectMock, mcqSources, 'mock-source');
+
+            const osceChapters = [...new Set(appState.allOsceCases.map(c => c.Chapter).filter(c => c))].sort();
+            const osceSources = [...new Set(appState.allOsceCases.map(c => c.Source).filter(s => s))].sort();
+            populateFilterOptions(chapterSelectOsce, osceChapters, 'osce-chapter');
+            populateFilterOptions(sourceSelectOsce, osceSources, 'osce-source');
         }
 
         async function handleLogin(event) {
@@ -891,8 +1199,8 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    currentUser = result.user;
-                    updateWatermark(currentUser);
+                    appState.currentUser = result.user;
+                    updateWatermark(appState.currentUser);
                     loadUserProgress();
                     await loadUserData();
                     showMainMenuScreen();
@@ -911,7 +1219,7 @@
         }
         
         function showScreen(screenToShow, isGuest = false) {
-            [loginContainer, mainMenuContainer, lecturesContainer, qbankContainer, listContainer, quizContainer, activityLogContainer, notesContainer, libraryContainer, leaderboardContainer].forEach(screen => {
+            [loginContainer, mainMenuContainer, lecturesContainer, qbankContainer, listContainer, quizContainer, activityLogContainer, notesContainer, libraryContainer, leaderboardContainer, osceContainer, osceQuizContainer, learningModeContainer].forEach(screen => {
                 if(screen) screen.classList.add('hidden');
             });
             if(screenToShow) screenToShow.classList.remove('hidden');
@@ -926,7 +1234,7 @@
                     activityLogBtn.classList.add('hidden');
                     notesBtn.classList.add('hidden');
                 } else {
-                    userNameDisplay.textContent = currentUser.Name;
+                    userNameDisplay.textContent = appState.currentUser.Name;
                     userNameDisplay.classList.remove('hidden');
                     logoutBtn.classList.remove('hidden');
                     activityLogBtn.classList.remove('hidden');
@@ -940,36 +1248,36 @@
 
         async function showMainMenuScreen() {
             showScreen(mainMenuContainer);
-            navigationHistory = [showMainMenuScreen];
+            appState.navigationHistory = [showMainMenuScreen];
             displayAnnouncement();
             await fetchAndShowLastActivity();
         }
         
         function showLecturesScreen() {
             showScreen(lecturesContainer);
-            navigationHistory.push(showLecturesScreen);
+            appState.navigationHistory.push(showLecturesScreen);
             renderLectures();
         }
 
         function showQbankScreen() {
             showScreen(qbankContainer);
-            navigationHistory.push(showQbankScreen);
+            appState.navigationHistory.push(showQbankScreen);
         }
 
         function showLibraryScreen() {
             showScreen(libraryContainer);
-            navigationHistory.push(showLibraryScreen);
+            appState.navigationHistory.push(showLibraryScreen);
             renderBooks();
         }
 
         async function showLeaderboardScreen() {
             showScreen(leaderboardContainer);
-            navigationHistory.push(showLeaderboardScreen);
+            appState.navigationHistory.push(showLeaderboardScreen);
             leaderboardList.innerHTML = '';
             currentUserRankDiv.innerHTML = '';
             leaderboardLoader.classList.remove('hidden');
             try {
-                const response = await fetch(`${API_URL}?request=leaderboard&userId=${currentUser.UniqueID}&t=${new Date().getTime()}`);
+                const response = await fetch(`${API_URL}?request=leaderboard&userId=${appState.currentUser.UniqueID}&t=${new Date().getTime()}`);
                 if (!response.ok) throw new Error('Failed to fetch leaderboard data.');
                 const data = await response.json();
                 if (data.error) throw new Error(data.error);
@@ -1045,12 +1353,12 @@
 
         function renderBooks() {
             libraryList.innerHTML = '';
-            if (mcqBooks.length === 0) {
+            if (appState.mcqBooks.length === 0) {
                 libraryList.innerHTML = `<p class="text-center text-slate-500">No books found in the library.</p>`;
                 return;
             }
 
-            mcqBooks.forEach(book => {
+            appState.mcqBooks.forEach(book => {
                 if (!book.Book || !book.Link) return;
                 const bookElement = document.createElement('a');
                 bookElement.href = book.Link;
@@ -1058,8 +1366,8 @@
                 bookElement.className = 'flex items-start p-4 bg-white rounded-lg border border-slate-200 shadow-sm hover:shadow-md hover:bg-slate-50 transition-all duration-200';
 
                 const iconHtml = `<div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-orange-100 rounded-lg mr-4">
-                                      <i class="${book.icon || 'fas fa-book'} text-2xl text-orange-600"></i>
-                                  </div>`;
+                                        <i class="${book.icon || 'fas fa-book'} text-2xl text-orange-600"></i>
+                                    </div>`;
                 
                 const contentHtml = `<div class="flex-grow">
                                          <h3 class="font-bold text-slate-800 text-lg">${book.Book}</h3>
@@ -1078,17 +1386,17 @@
         function renderLectures(filterText = '') {
             lecturesList.innerHTML = '';
             const lowerCaseFilter = filterText.toLowerCase();
-            const chapterNames = Object.keys(groupedLectures).sort();
+            const chapterNames = Object.keys(appState.groupedLectures).sort();
             let chaptersFound = 0;
 
-            if (Object.keys(groupedLectures).length === 0) {
+            if (Object.keys(appState.groupedLectures).length === 0) {
                 lecturesLoader.classList.remove('hidden');
                 return;
             }
             lecturesLoader.classList.add('hidden');
 
             chapterNames.forEach(chapterName => {
-                const chapterData = groupedLectures[chapterName];
+                const chapterData = appState.groupedLectures[chapterName];
                 const isChapterMatch = chapterName.toLowerCase().includes(lowerCaseFilter);
                 const isTopicMatch = chapterData.topics.some(topic => topic.name.toLowerCase().includes(lowerCaseFilter));
                 if (filterText && !isChapterMatch && !isTopicMatch) return;
@@ -1118,7 +1426,7 @@
                 chapterData.topics.forEach(topic => {
                     const listItem = document.createElement('li');
                     listItem.className = 'flex items-center justify-between p-3 rounded-md hover:bg-blue-100 transition-colors group';
-                    const isViewed = viewedLectures.has(topic.link);
+                    const isViewed = appState.viewedLectures.has(topic.link);
                     
                     if (isViewed) {
                         listItem.classList.add('lecture-viewed');
@@ -1136,7 +1444,7 @@
                     });
 
                     const noteIcon = document.createElement('i');
-                    const hasNote = userLectureNotes.some(note => note.LectureID === topic.id);
+                    const hasNote = appState.userLectureNotes.some(note => note.LectureID === topic.id);
                     noteIcon.className = `fas fa-sticky-note text-slate-400 hover:text-amber-500 note-icon ${hasNote ? 'has-note' : ''}`;
                     noteIcon.addEventListener('click', (e) => {
                          e.preventDefault();
@@ -1172,7 +1480,7 @@
                 contentDiv.appendChild(topicList);
                 const actionsDiv = document.createElement('div');
                 actionsDiv.className = 'mt-4 pt-4 border-t border-slate-200 flex flex-col sm:flex-row gap-3';
-                const relevantQuestions = allQuestions.filter(q => q.chapter.trim().toLowerCase() === chapterName.trim().toLowerCase());
+                const relevantQuestions = appState.allQuestions.filter(q => q.chapter.trim().toLowerCase() === chapterName.trim().toLowerCase());
                 if (relevantQuestions.length > 0) {
                     const quizButton = document.createElement('button');
                     quizButton.className = 'w-full action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2';
@@ -1196,15 +1504,15 @@
                 lecturesList.appendChild(details);
             });
             if (chaptersFound === 0) {
-                 lecturesList.innerHTML = `<p class="text-slate-500 text-center">No lectures found matching your search.</p>`;
+                 lecturesList.innerHTML = `<p class="text-center text-slate-500">No lectures found matching your search.</p>`;
             }
         }
 
         function toggleLectureViewed(lectureLink, lectureName) {
-            if (viewedLectures.has(lectureLink)) {
-                viewedLectures.delete(lectureLink);
+            if (appState.viewedLectures.has(lectureLink)) {
+                appState.viewedLectures.delete(lectureLink);
             } else {
-                viewedLectures.add(lectureLink);
+                appState.viewedLectures.add(lectureLink);
                 logUserActivity({
                     eventType: 'ViewLecture',
                     lectureName: lectureName 
@@ -1215,27 +1523,27 @@
         }
 
         function saveUserProgress() {
-            if (!currentUser || currentUser.Role === 'Guest') return;
-            localStorage.setItem(`viewedLectures_${currentUser.UniqueID}`, JSON.stringify(Array.from(viewedLectures)));
+            if (!appState.currentUser || appState.currentUser.Role === 'Guest') return;
+            localStorage.setItem(`viewedLectures_${appState.currentUser.UniqueID}`, JSON.stringify(Array.from(appState.viewedLectures)));
         }
 
         function loadUserProgress() {
-            if (!currentUser || currentUser.Role === 'Guest') return;
-            const savedLectures = localStorage.getItem(`viewedLectures_${currentUser.UniqueID}`);
+            if (!appState.currentUser || appState.currentUser.Role === 'Guest') return;
+            const savedLectures = localStorage.getItem(`viewedLectures_${appState.currentUser.UniqueID}`);
             if (savedLectures) {
-                viewedLectures = new Set(JSON.parse(savedLectures));
+                appState.viewedLectures = new Set(JSON.parse(savedLectures));
             }
         }
 
         async function fetchAndShowLastActivity() {
-            if (!currentUser || currentUser.Role === 'Guest') return;
+            if (!appState.currentUser || appState.currentUser.Role === 'Guest') return;
             lastLectureRibbon.classList.add('hidden');
             lastQuizRibbon.classList.add('hidden');
             
-            if (fullActivityLog.length === 0) return;
+            if (appState.fullActivityLog.length === 0) return;
 
-            const lastLecture = fullActivityLog.find(log => log.eventType === 'ViewLecture');
-            const lastQuiz = fullActivityLog.find(log => log.eventType === 'FinishQuiz');
+            const lastLecture = appState.fullActivityLog.find(log => log.eventType === 'ViewLecture');
+            const lastQuiz = appState.fullActivityLog.find(log => log.eventType === 'FinishQuiz');
 
             if (lastLecture) {
                 lastLectureRibbon.innerHTML = `<i class="fas fa-video mr-2"></i> Last Lecture Viewed: <strong>${lastLecture.title}</strong>`;
@@ -1249,7 +1557,7 @@
 
         async function showActivityLog() {
             showScreen(activityLogContainer);
-            navigationHistory.push(showActivityLog);
+            appState.navigationHistory.push(showActivityLog);
             activityLogList.innerHTML = '<div class="loader"></div>';
             await loadUserData();
             renderFilteredLog('all');
@@ -1264,7 +1572,7 @@
             quizSummary.classList.add('hidden');
             lectureSummary.classList.add('hidden');
 
-            const logsToDisplay = fullActivityLog.filter(log => {
+            const logsToDisplay = appState.fullActivityLog.filter(log => {
                 if (filter === 'all') return true;
                 if (filter === 'quizzes') return log.eventType === 'FinishQuiz';
                 if (filter === 'lectures') return log.eventType === 'ViewLecture';
@@ -1273,7 +1581,7 @@
             
             renderActivityChart(logsToDisplay);
 
-            const quizLogs = fullActivityLog.filter(log => log.eventType === 'FinishQuiz');
+            const quizLogs = appState.fullActivityLog.filter(log => log.eventType === 'FinishQuiz');
             let totalCorrect = 0;
             let totalAttemptedInQuizzes = 0;
 
@@ -1287,10 +1595,10 @@
 
             if (filter === 'all') {
                 allSummary.classList.remove('hidden');
-                const totalLecturesInSystem = Object.values(groupedLectures).reduce((acc, chapter) => acc + chapter.topics.length, 0);
-                const viewedLectureCount = new Set(fullActivityLog.filter(l => l.eventType === 'ViewLecture').map(l => l.title)).size;
+                const totalLecturesInSystem = Object.values(appState.groupedLectures).reduce((acc, chapter) => acc + chapter.topics.length, 0);
+                const viewedLectureCount = new Set(appState.fullActivityLog.filter(l => l.eventType === 'ViewLecture').map(l => l.title)).size;
                 allLecturesProgress.textContent = `${viewedLectureCount} / ${totalLecturesInSystem}`;
-                allQuestionsProgress.textContent = `${totalAttemptedInQuizzes} / ${allQuestions.length}`;
+                allQuestionsProgress.textContent = `${totalAttemptedInQuizzes} / ${appState.allQuestions.length}`;
 
             } else if (filter === 'quizzes') {
                 quizSummary.classList.remove('hidden');
@@ -1300,14 +1608,14 @@
                 overallAccuracy.textContent = `${accuracy}%`;
             } else if (filter === 'lectures') {
                 lectureSummary.classList.remove('hidden');
-                const viewedLogs = fullActivityLog.filter(log => log.eventType === 'ViewLecture');
+                const viewedLogs = appState.fullActivityLog.filter(log => log.eventType === 'ViewLecture');
                 const uniqueViewedLectures = new Set(viewedLogs.map(l => l.title));
                 lecturesViewedCount.textContent = uniqueViewedLectures.size;
                 
                 const uniqueChapters = new Set();
                 viewedLogs.forEach(log => {
-                    for (const chapterName in groupedLectures) {
-                        if (groupedLectures[chapterName].topics.some(t => t.name === log.title)) {
+                    for (const chapterName in appState.groupedLectures) {
+                        if (appState.groupedLectures[chapterName].topics.some(t => t.name === log.title)) {
                             uniqueChapters.add(chapterName);
                             break;
                         }
@@ -1370,8 +1678,8 @@
         }
 
         function renderActivityChart(logs) {
-            if (activityChartInstance) {
-                activityChartInstance.destroy();
+            if (appState.activityChartInstance) {
+                appState.activityChartInstance.destroy();
             }
             const labels = [];
             const activityByDay = {};
@@ -1398,7 +1706,7 @@
             const lectureData = Object.values(activityByDay).map(d => d.lectures);
             const quizData = Object.values(activityByDay).map(d => d.quizzes);
 
-            activityChartInstance = new Chart(activityChartCanvas, {
+            appState.activityChartInstance = new Chart(activityChartCanvas, {
                 type: 'bar',
                 data: {
                     labels: labels,
@@ -1433,13 +1741,18 @@
             });
         }
 
-        function showSourceList() {
+        function showSourceList(isLearningMode = false) {
             showScreen(listContainer);
-            navigationHistory.push(showSourceList);
-            listTitle.textContent = "Browse by Source";
+            const action = isLearningMode ? () => showChapterList(sourceGroup.displayName, true) : () => showChapterList(sourceGroup.displayName, false);
+            
+            if (appState.navigationHistory[appState.navigationHistory.length - 1] !== showSourceList) {
+               appState.navigationHistory.push(() => showSourceList(isLearningMode));
+            }
+
+            listTitle.textContent = isLearningMode ? "Study by Source" : "Browse by Source";
             listItems.innerHTML = '';
             const sourceGroups = new Map();
-            allQuestions.forEach(q => {
+            appState.allQuestions.forEach(q => {
                 const sourceName = (q.source && q.source.trim()) ? q.source.trim() : "Uncategorized";
                 const normalizedKey = sourceName.toLowerCase();
                 if (sourceGroups.has(normalizedKey)) {
@@ -1453,19 +1766,25 @@
                 const button = document.createElement('button');
                 button.innerHTML = `<span>${sourceGroup.displayName}</span> <span class="text-xs font-normal opacity-75">(${sourceGroup.count} Qs)</span>`;
                 button.className = 'action-btn w-full p-4 rounded-lg bg-indigo-600 text-white font-semibold text-lg hover:bg-indigo-700 flex flex-col items-center justify-center text-center';
-                button.addEventListener('click', () => showChapterList(sourceGroup.displayName));
+                button.addEventListener('click', () => showChapterList(sourceGroup.displayName, isLearningMode));
                 listItems.appendChild(button);
             });
         }
 
-        function showChapterList(sourceFilter = 'All') {
+        function showChapterList(sourceFilter = 'All', isLearningMode = false) {
             showScreen(listContainer);
-            if (navigationHistory[navigationHistory.length - 1] !== showChapterList) {
-                navigationHistory.push(() => showChapterList(sourceFilter));
+            
+            const prevNav = appState.navigationHistory[appState.navigationHistory.length - 1];
+            if (!prevNav || prevNav.toString() !== (() => showChapterList(sourceFilter, isLearningMode)).toString()) {
+                appState.navigationHistory.push(() => showChapterList(sourceFilter, isLearningMode));
             }
-            listTitle.textContent = sourceFilter === 'All' ? "All Chapters" : `Chapters in ${sourceFilter}`;
+
+            listTitle.textContent = sourceFilter === 'All' 
+                ? (isLearningMode ? "Study All Chapters" : "All Chapters") 
+                : (isLearningMode ? `Study Chapters in ${sourceFilter}`: `Chapters in ${sourceFilter}`);
+            
             listItems.innerHTML = '';
-            const questionsToDisplay = (sourceFilter === 'All') ? allQuestions : allQuestions.filter(q => q.source === sourceFilter);
+            const questionsToDisplay = (sourceFilter === 'All') ? appState.allQuestions : appState.allQuestions.filter(q => q.source === sourceFilter);
             const chapters = {};
             questionsToDisplay.forEach(q => {
                 if (!chapters[q.chapter]) chapters[q.chapter] = [];
@@ -1476,7 +1795,11 @@
                 const button = document.createElement('button');
                 button.innerHTML = `<span>${chapterName}</span> <span class="text-xs font-normal opacity-75">(${chapters[chapterName].length} Qs)</span>`;
                 button.className = 'action-btn w-full p-4 rounded-lg bg-blue-600 text-white font-semibold text-lg hover:bg-blue-700 flex flex-col items-center justify-center text-center';
-                button.addEventListener('click', () => startChapterQuiz(chapterName, chapters[chapterName]));
+                if (isLearningMode) {
+                    button.addEventListener('click', () => launchLearningMode(chapterName, chapters[chapterName]));
+                } else {
+                    button.addEventListener('click', () => startChapterQuiz(chapterName, chapters[chapterName]));
+                }
                 listItems.appendChild(button);
             }
         }
@@ -1497,7 +1820,7 @@
             const customTime = parseInt(customTimerInput.value, 10);
             const selectedChapters = [...chapterSelectMock.querySelectorAll('input:checked')].map(el => el.value);
             const selectedSources = [...sourceSelectMock.querySelectorAll('input:checked')].map(el => el.value);
-            let filteredQuestions = allQuestions;
+            let filteredQuestions = appState.allQuestions;
             if (selectedChapters.length > 0) filteredQuestions = filteredQuestions.filter(q => selectedChapters.includes(q.chapter));
             if (selectedSources.length > 0) filteredQuestions = filteredQuestions.filter(q => selectedSources.includes(q.source));
             if (filteredQuestions.length === 0) {
@@ -1517,38 +1840,38 @@
         }
 
         function launchQuiz(questions, title, timePerQuestion = DEFAULT_TIME_PER_QUESTION, reviewMode = false, pastAnswers = null, isMistakePractice = false) {
-            isReviewMode = reviewMode;
-            isPracticingMistakes = isMistakePractice;
+            appState.currentQuiz.isReviewMode = reviewMode;
+            appState.currentQuiz.isPracticingMistakes = isMistakePractice;
             showScreen(quizContainer);
-            currentQuestionIndex = 0;
-            score = 0;
-            currentQuizQuestions = questions;
+            appState.currentQuiz.currentQuestionIndex = 0;
+            appState.currentQuiz.score = 0;
+            appState.currentQuiz.questions = questions;
             
-            if (!isReviewMode) {
-                originalQuizQuestions = [...questions];
-                userAnswers = new Array(questions.length).fill(null);
-                originalUserAnswers = userAnswers;
+            if (!appState.currentQuiz.isReviewMode) {
+                appState.currentQuiz.originalQuestions = [...questions];
+                appState.currentQuiz.userAnswers = new Array(questions.length).fill(null);
+                appState.currentQuiz.originalUserAnswers = appState.currentQuiz.userAnswers;
             } else {
-                originalQuizQuestions = [...questions];
-                userAnswers = pastAnswers;
-                originalUserAnswers = pastAnswers;
+                appState.currentQuiz.originalQuestions = [...questions];
+                appState.currentQuiz.userAnswers = pastAnswers;
+                appState.currentQuiz.originalUserAnswers = pastAnswers;
             }
 
-            flaggedIndices.clear();
+            appState.currentQuiz.flaggedIndices.clear();
             resultsContainer.classList.add('hidden');
             questionContainer.classList.remove('hidden');
             controlsContainer.classList.remove('hidden');
-            quizTitle.textContent = isReviewMode ? `Review: ${title}` : title;
-            totalQuestionsSpan.textContent = currentQuizQuestions.length;
+            quizTitle.textContent = appState.currentQuiz.isReviewMode ? `Review: ${title}` : title;
+            totalQuestionsSpan.textContent = appState.currentQuiz.questions.length;
             updateScoreBar();
             showQuestion();
         }
 
         function updateScoreBar() {
-            const totalQuestions = currentQuizQuestions.length;
+            const totalQuestions = appState.currentQuiz.questions.length;
             if (totalQuestions === 0) return;
-            const answeredQuestions = userAnswers.filter(a => a !== null).length;
-            const correctCount = userAnswers.filter(a => a && a.isCorrect).length;
+            const answeredQuestions = appState.currentQuiz.userAnswers.filter(a => a !== null).length;
+            const correctCount = appState.currentQuiz.userAnswers.filter(a => a && a.isCorrect).length;
             const incorrectCount = answeredQuestions - correctCount;
             scoreProgressText.textContent = `Score: ${correctCount} / ${answeredQuestions}`;
             scoreBarCorrect.style.width = `${(correctCount / totalQuestions) * 100}%`;
@@ -1557,7 +1880,7 @@
 
         function showQuestion() {
             resetQuizState();
-            const currentQuestion = currentQuizQuestions[currentQuestionIndex];
+            const currentQuestion = appState.currentQuiz.questions[appState.currentQuiz.currentQuestionIndex];
             
             if (currentQuestion.ImageURL) {
                 const img = document.createElement('img');
@@ -1569,22 +1892,22 @@
             }
 
             questionText.textContent = currentQuestion.question;
-            progressText.textContent = `Question ${currentQuestionIndex + 1} of ${currentQuizQuestions.length}`;
+            progressText.textContent = `Question ${appState.currentQuiz.currentQuestionIndex + 1} of ${appState.currentQuiz.questions.length}`;
             sourceText.textContent = `Source: ${currentQuestion.source || 'N/A'} | Chapter: ${currentQuestion.chapter || 'N/A'}`;
-            previousBtn.disabled = currentQuestionIndex === 0;
-            previousBtn.classList.toggle('opacity-50', currentQuestionIndex === 0);
+            previousBtn.disabled = appState.currentQuiz.currentQuestionIndex === 0;
+            previousBtn.classList.toggle('opacity-50', appState.currentQuiz.currentQuestionIndex === 0);
             
-            if (isReviewMode && currentQuestionIndex === currentQuizQuestions.length - 1) {
+            if (appState.currentQuiz.isReviewMode && appState.currentQuiz.currentQuestionIndex === appState.currentQuiz.questions.length - 1) {
                 nextSkipBtn.textContent = 'Finish Review';
             } else {
                 nextSkipBtn.textContent = 'Next';
             }
-            nextSkipBtn.disabled = currentQuestionIndex === currentQuizQuestions.length - 1 && !isReviewMode;
-            nextSkipBtn.classList.toggle('opacity-50', currentQuestionIndex === currentQuizQuestions.length - 1 && !isReviewMode);
+            nextSkipBtn.disabled = appState.currentQuiz.currentQuestionIndex === appState.currentQuiz.questions.length - 1 && !appState.currentQuiz.isReviewMode;
+            nextSkipBtn.classList.toggle('opacity-50', appState.currentQuiz.currentQuestionIndex === appState.currentQuiz.questions.length - 1 && !appState.currentQuiz.isReviewMode);
 
-            flagBtn.classList.toggle('flagged', flaggedIndices.has(currentQuestionIndex));
+            flagBtn.classList.toggle('flagged', appState.currentQuiz.flaggedIndices.has(appState.currentQuiz.currentQuestionIndex));
             
-            const shuffledAnswers = isReviewMode ? [...currentQuestion.answerOptions] : [...currentQuestion.answerOptions].sort(() => Math.random() - 0.5);
+            const shuffledAnswers = appState.currentQuiz.isReviewMode ? [...currentQuestion.answerOptions] : [...currentQuestion.answerOptions].sort(() => Math.random() - 0.5);
             
             shuffledAnswers.forEach(answer => {
                 const buttonContainer = document.createElement('div');
@@ -1602,29 +1925,29 @@
                 answerButtons.appendChild(buttonContainer);
             });
 
-            if (userAnswers[currentQuestionIndex] !== null || isReviewMode) {
+            if (appState.currentQuiz.userAnswers[appState.currentQuiz.currentQuestionIndex] !== null || appState.currentQuiz.isReviewMode) {
                 showAnswerResult();
             }
             
-            if (!isReviewMode) {
+            if (!appState.currentQuiz.isReviewMode) {
                 startTimer();
             } else {
                 timerDisplay.textContent = 'Review';
             }
             
-            const hasNote = userQuizNotes.some(note => note.QuizID === currentQuestion.UniqueID);
+            const hasNote = appState.userQuizNotes.some(note => note.QuizID === currentQuestion.UniqueID);
             quizNoteBtn.classList.toggle('has-note', hasNote);
         }
 
         function startTimer() {
-            if (userAnswers[currentQuestionIndex] === null) {
-                let timeLeft = currentQuizTimePerQuestion;
+            if (appState.currentQuiz.userAnswers[appState.currentQuiz.currentQuestionIndex] === null) {
+                let timeLeft = appState.currentQuiz.timePerQuestion;
                 timerDisplay.textContent = formatTime(timeLeft);
-                timerInterval = setInterval(() => {
+                appState.currentQuiz.timerInterval = setInterval(() => {
                     timeLeft--;
                     timerDisplay.textContent = formatTime(timeLeft);
                     if (timeLeft <= 0) {
-                        clearInterval(timerInterval);
+                        clearInterval(appState.currentQuiz.timerInterval);
                         handleTimeUp();
                     }
                 }, 1000);
@@ -1640,13 +1963,13 @@
         }
 
         function handleTimeUp() {
-            userAnswers[currentQuestionIndex] = { answer: 'No Answer', isCorrect: false };
+            appState.currentQuiz.userAnswers[appState.currentQuiz.currentQuestionIndex] = { answer: 'No Answer', isCorrect: false };
             showAnswerResult();
             updateScoreBar();
         }
 
         function resetQuizState() {
-            clearInterval(timerInterval);
+            clearInterval(appState.currentQuiz.timerInterval);
             answerButtons.innerHTML = '';
             questionImageContainer.innerHTML = '';
             hintBtn.classList.remove('hidden');
@@ -1654,32 +1977,32 @@
         }
 
         function selectAnswer(e, selectedAnswer) {
-            if (isReviewMode) return;
+            if (appState.currentQuiz.isReviewMode) return;
 
-            clearInterval(timerInterval);
-            const currentQuestion = currentQuizQuestions[currentQuestionIndex];
+            clearInterval(appState.currentQuiz.timerInterval);
+            const currentQuestion = appState.currentQuiz.questions[appState.currentQuiz.currentQuestionIndex];
 
-            if(userAnswers[currentQuestionIndex] === null && selectedAnswer.isCorrect) {
-                score++;
-                if (isPracticingMistakes) {
+            if(appState.currentQuiz.userAnswers[appState.currentQuiz.currentQuestionIndex] === null && selectedAnswer.isCorrect) {
+                appState.currentQuiz.score++;
+                if (appState.currentQuiz.isPracticingMistakes) {
                     logCorrectedMistake(currentQuestion.UniqueID);
                 }
-            } else if (userAnswers[currentQuestionIndex] === null && !selectedAnswer.isCorrect) {
-                 if (!isPracticingMistakes) {
+            } else if (appState.currentQuiz.userAnswers[appState.currentQuiz.currentQuestionIndex] === null && !selectedAnswer.isCorrect) {
+                 if (!appState.currentQuiz.isPracticingMistakes) {
                     logIncorrectAnswer(currentQuestion.UniqueID, selectedAnswer.text);
                 }
             }
             
-            userAnswers[currentQuestionIndex] = { answer: selectedAnswer.text, isCorrect: selectedAnswer.isCorrect };
+            appState.currentQuiz.userAnswers[appState.currentQuiz.currentQuestionIndex] = { answer: selectedAnswer.text, isCorrect: selectedAnswer.isCorrect };
             showAnswerResult();
             updateScoreBar();
-            if (userAnswers.every(answer => answer !== null)) {
+            if (appState.currentQuiz.userAnswers.every(answer => answer !== null)) {
                 setTimeout(showResults, 1000);
             }
         }
         
         function showAnswerResult() {
-            const userAnswer = userAnswers[currentQuestionIndex];
+            const userAnswer = appState.currentQuiz.userAnswers[appState.currentQuiz.currentQuestionIndex];
             Array.from(answerButtons.children).forEach(buttonContainer => {
                 const button = buttonContainer.querySelector('button');
                 const rationale = buttonContainer.querySelector('p');
@@ -1704,10 +2027,10 @@
             questionContainer.classList.add('hidden');
             controlsContainer.classList.add('hidden');
             resultsContainer.classList.remove('hidden');
-            scoreText.textContent = score;
-            progressText.textContent = "Quiz Finished!";
+            resultsTitle.textContent = "Quiz Complete!";
+            resultsScoreText.innerHTML = `Your score is <span id="score-text" class="font-bold">${appState.currentQuiz.score}</span> out of <span id="total-questions" class="font-bold">${appState.currentQuiz.originalQuestions.length}</span>.`;
             
-            const incorrectCount = originalUserAnswers.filter(a => a && !a.isCorrect).length;
+            const incorrectCount = appState.currentQuiz.originalUserAnswers.filter(a => a && !a.isCorrect).length;
             if (incorrectCount > 0) {
                 reviewIncorrectBtn.classList.remove('hidden');
                 reviewIncorrectBtn.textContent = `Review ${incorrectCount} Incorrect`;
@@ -1715,34 +2038,35 @@
                 reviewIncorrectBtn.classList.add('hidden');
             }
 
-            if (!isReviewMode && !isPracticingMistakes) {
+            if (!appState.currentQuiz.isReviewMode && !appState.currentQuiz.isPracticingMistakes) {
                 logUserActivity({
                     eventType: 'FinishQuiz',
                     quizTitle: quizTitle.textContent,
-                    score: score,
-                    totalQuestions: originalQuizQuestions.length
+                    score: appState.currentQuiz.score,
+                    totalQuestions: appState.currentQuiz.originalQuestions.length
                 });
             }
         }
 
         function handleNextQuestion() {
-            if (currentQuestionIndex < currentQuizQuestions.length - 1) {
-                currentQuestionIndex++;
+            if (appState.currentQuiz.currentQuestionIndex < appState.currentQuiz.questions.length - 1) {
+                appState.currentQuiz.currentQuestionIndex++;
                 showQuestion();
-            } else if (isReviewMode) {
+            } else if (appState.currentQuiz.isReviewMode) {
                 showResults();
             }
         }
         
         function handlePreviousQuestion() {
-            if (currentQuestionIndex > 0) {
-                currentQuestionIndex--;
+            if (appState.currentQuiz.currentQuestionIndex > 0) {
+                appState.currentQuiz.currentQuestionIndex--;
                 showQuestion();
             }
         }
 
         function toggleFlag() {
-            flaggedIndices.has(currentQuestionIndex) ? flaggedIndices.delete(currentQuestionIndex) : flaggedIndices.add(currentQuestionIndex);
+            const index = appState.currentQuiz.currentQuestionIndex;
+            appState.currentQuiz.flaggedIndices.has(index) ? appState.currentQuiz.flaggedIndices.delete(index) : appState.currentQuiz.flaggedIndices.add(index);
             flagBtn.classList.toggle('flagged');
         }
 
@@ -1755,7 +2079,7 @@
         }
 
         function showConfirmationModal(title, text, onConfirm) {
-            modalConfirmAction = onConfirm;
+            appState.modalConfirmAction = onConfirm;
             confirmationModal.querySelector('#modal-title').textContent = title;
             confirmationModal.querySelector('#modal-text').textContent = text;
             questionNavigatorModal.classList.add('hidden');
@@ -1766,21 +2090,21 @@
 
         function showQuestionNavigator() {
             navigatorGrid.innerHTML = '';
-            currentQuizQuestions.forEach((_, index) => {
+            appState.currentQuiz.questions.forEach((_, index) => {
                 const button = document.createElement('button');
                 button.textContent = index + 1;
                 button.className = 'navigator-btn w-10 h-10 rounded-md font-semibold flex items-center justify-center';
-                const answer = userAnswers[index];
+                const answer = appState.currentQuiz.userAnswers[index];
                 if (answer === null) button.classList.add('unanswered');
                 else if (answer.isCorrect) button.classList.add('correct');
                 else button.classList.add('incorrect');
-                if (flaggedIndices.has(index)) {
+                if (appState.currentQuiz.flaggedIndices.has(index)) {
                     const flagIcon = document.createElement('i');
                     flagIcon.className = 'fas fa-flag flag-icon';
                     button.appendChild(flagIcon);
                 }
                 button.addEventListener('click', () => {
-                    currentQuestionIndex = index;
+                    appState.currentQuiz.currentQuestionIndex = index;
                     showQuestion();
                     modalBackdrop.classList.add('hidden');
                 });
@@ -1794,8 +2118,8 @@
 
         function handleLogout() {
             showConfirmationModal('Log Out?', 'Are you sure you want to log out?', () => {
-                currentUser = null;
-                navigationHistory = [];
+                appState.currentUser = null;
+                appState.navigationHistory = [];
                 usernameInput.value = '';
                 passwordInput.value = '';
                 showScreen(loginContainer);
@@ -1804,7 +2128,7 @@
         }
         
         function triggerEndQuiz() {
-            if (isReviewMode) {
+            if (appState.currentQuiz.isReviewMode) {
                 showMainMenuScreen();
                 return;
             }
@@ -1815,30 +2139,30 @@
         }
 
         function handleBackNavigation() {
-            if (navigationHistory.length > 1) {
-                navigationHistory.pop();
-                const previousPage = navigationHistory[navigationHistory.length - 1];
+            if (appState.navigationHistory.length > 1) {
+                appState.navigationHistory.pop();
+                const previousPage = appState.navigationHistory[appState.navigationHistory.length - 1];
                 previousPage();
             }
         }
 
         function startFreeTest() {
-            if (allQuestions.length === 0) {
+            if (appState.allQuestions.length === 0) {
                 alert("Questions are still loading, please wait a moment.");
                 return;
             }
-            const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+            const shuffled = [...appState.allQuestions].sort(() => 0.5 - Math.random());
             const sampleQuestions = shuffled.slice(0, 10);
-            currentUser = { Name: 'Guest', UniqueID: `guest_${Date.now()}`, Role: 'Guest' };
+            appState.currentUser = { Name: 'Guest', UniqueID: `guest_${Date.now()}`, Role: 'Guest' };
             launchQuiz(sampleQuestions, "Free Sample Test");
         }
 
         function startIncorrectReview() {
-            const incorrectQuestions = originalQuizQuestions.filter((question, index) => {
-                const answer = originalUserAnswers[index];
+            const incorrectQuestions = appState.currentQuiz.originalQuestions.filter((question, index) => {
+                const answer = appState.currentQuiz.originalUserAnswers[index];
                 return answer && !answer.isCorrect;
             });
-            const pastAnswers = originalUserAnswers.filter(a => a && !a.isCorrect);
+            const pastAnswers = appState.currentQuiz.originalUserAnswers.filter(a => a && !a.isCorrect);
             launchQuiz(incorrectQuestions, quizTitle.textContent.replace('Review: ', ''), undefined, true, pastAnswers);
         }
 
@@ -1850,7 +2174,7 @@
             progressText.textContent = 'Loading review...';
 
             try {
-                const response = await fetch(`${API_URL}?request=reviewQuiz&logId=${encodeURIComponent(logId)}&userId=${currentUser.UniqueID}`);
+                const response = await fetch(`${API_URL}?request=reviewQuiz&logId=${encodeURIComponent(logId)}&userId=${appState.currentUser.UniqueID}`);
                 if (!response.ok) throw new Error('Failed to fetch review data.');
                 
                 const data = await response.json();
@@ -1877,7 +2201,7 @@
         // --- NOTES FUNCTIONS ---
         function showNotesScreen() {
             showScreen(notesContainer);
-            navigationHistory.push(showNotesScreen);
+            appState.navigationHistory.push(showNotesScreen);
             renderNotes('quizzes');
         }
 
@@ -1886,7 +2210,7 @@
             document.querySelectorAll('#notes-container .filter-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`notes-filter-${filter}`).classList.add('active');
 
-            const notesToDisplay = filter === 'quizzes' ? userQuizNotes : userLectureNotes;
+            const notesToDisplay = filter === 'quizzes' ? appState.userQuizNotes : appState.userLectureNotes;
 
             if (notesToDisplay.length === 0) {
                 notesList.innerHTML = `<p class="text-center text-slate-500">No notes found for this category.</p>`;
@@ -1902,12 +2226,12 @@
                 let noteType = '';
 
                 if (filter === 'quizzes') {
-                    const question = allQuestions.find(q => q.UniqueID === note.QuizID);
+                    const question = appState.allQuestions.find(q => q.UniqueID === note.QuizID);
                     title = question ? `Note on: ${question.question.substring(0, 50)}...` : 'Note on deleted question';
                     itemId = note.QuizID;
                     noteType = 'quiz';
                 } else {
-                    const lecture = Object.values(groupedLectures).flatMap(c => c.topics).find(t => t.id === note.LectureID);
+                    const lecture = Object.values(appState.groupedLectures).flatMap(c => c.topics).find(t => t.id === note.LectureID);
                     title = lecture ? `Note on: ${lecture.name}` : 'Note on deleted lecture';
                     itemId = note.LectureID;
                     noteType = 'lecture';
@@ -1936,15 +2260,15 @@
         }
 
         function openNoteModal(type, itemId, itemTitle) {
-            currentNote = { type, itemId, itemTitle };
+            appState.currentNote = { type, itemId, itemTitle };
             let existingNote;
 
             if (type === 'quiz') {
                 noteModalTitle.textContent = `Note on: ${itemTitle.substring(0, 40)}...`;
-                existingNote = userQuizNotes.find(n => n.QuizID === itemId);
+                existingNote = appState.userQuizNotes.find(n => n.QuizID === itemId);
             } else { // 'lecture'
                 noteModalTitle.textContent = `Note on: ${itemTitle}`;
-                existingNote = userLectureNotes.find(n => n.LectureID === itemId);
+                existingNote = appState.userLectureNotes.find(n => n.LectureID === itemId);
             }
 
             noteTextarea.value = existingNote ? existingNote.NoteText : '';
@@ -1957,14 +2281,13 @@
 
         function handleSaveNote() {
             const noteText = noteTextarea.value;
-            const noteType = currentNote.type;
-            const itemId = currentNote.itemId;
-            const uniqueId = `${currentUser.UniqueID}_${itemId}`;
+            const { type, itemId } = appState.currentNote;
+            const uniqueId = `${appState.currentUser.UniqueID}_${itemId}`;
 
             const payload = {
-                eventType: noteType === 'quiz' ? 'saveQuizNote' : 'saveLectureNote',
+                eventType: type === 'quiz' ? 'saveQuizNote' : 'saveLectureNote',
                 uniqueId: uniqueId,
-                userId: currentUser.UniqueID,
+                userId: appState.currentUser.UniqueID,
                 itemId: itemId,
                 noteText: noteText
             };
@@ -1976,22 +2299,22 @@
             }).catch(err => console.error("Failed to save note:", err));
 
             // Update local data for immediate UI feedback
-            if (noteType === 'quiz') {
-                const existingNoteIndex = userQuizNotes.findIndex(n => n.QuizID === itemId);
+            if (type === 'quiz') {
+                const existingNoteIndex = appState.userQuizNotes.findIndex(n => n.QuizID === itemId);
                 if (existingNoteIndex > -1) {
-                    userQuizNotes[existingNoteIndex].NoteText = noteText;
+                    appState.userQuizNotes[existingNoteIndex].NoteText = noteText;
                 } else {
-                    userQuizNotes.push({ UniqueID: uniqueId, QuizID: itemId, NoteText: noteText });
+                    appState.userQuizNotes.push({ UniqueID: uniqueId, QuizID: itemId, NoteText: noteText });
                 }
                 if (quizContainer.style.display !== 'none') {
                     quizNoteBtn.classList.toggle('has-note', noteText.length > 0);
                 }
             } else {
-                const existingNoteIndex = userLectureNotes.findIndex(n => n.LectureID === itemId);
+                const existingNoteIndex = appState.userLectureNotes.findIndex(n => n.LectureID === itemId);
                 if (existingNoteIndex > -1) {
-                    userLectureNotes[existingNoteIndex].NoteText = noteText;
+                    appState.userLectureNotes[existingNoteIndex].NoteText = noteText;
                 } else {
-                    userLectureNotes.push({ UniqueID: uniqueId, LectureID: itemId, NoteText: noteText });
+                    appState.userLectureNotes.push({ UniqueID: uniqueId, LectureID: itemId, NoteText: noteText });
                 }
                 renderLectures(lectureSearchInput.value); // Re-render to update icon
             }
@@ -2015,9 +2338,9 @@
 
                 // Update local data for immediate UI feedback
                 if (noteType === 'quiz') {
-                    userQuizNotes = userQuizNotes.filter(n => n.UniqueID !== uniqueId);
+                    appState.userQuizNotes = appState.userQuizNotes.filter(n => n.UniqueID !== uniqueId);
                 } else {
-                    userLectureNotes = userLectureNotes.filter(n => n.UniqueID !== uniqueId);
+                    appState.userLectureNotes = appState.userLectureNotes.filter(n => n.UniqueID !== uniqueId);
                 }
                 
                 // Re-render the currently visible screen if it's affected
@@ -2026,8 +2349,8 @@
                 } else if (lecturesContainer.style.display !== 'none') {
                     renderLectures(lectureSearchInput.value);
                 } else if (quizContainer.style.display !== 'none') {
-                    const currentQuestion = currentQuizQuestions[currentQuestionIndex];
-                    const hasNote = userQuizNotes.some(note => note.QuizID === currentQuestion.UniqueID);
+                    const currentQuestion = appState.currentQuiz.questions[appState.currentQuiz.currentQuestionIndex];
+                    const hasNote = appState.userQuizNotes.some(note => note.QuizID === currentQuestion.UniqueID);
                     quizNoteBtn.classList.toggle('has-note', hasNote);
                 }
 
@@ -2044,7 +2367,7 @@
 
             const payload = {
                 eventType: eventType,
-                userId: currentUser.UniqueID
+                userId: appState.currentUser.UniqueID
             };
 
             fetch(API_URL, {
@@ -2055,11 +2378,11 @@
 
             // Update local data for immediate UI feedback
             if (logType === 'quiz') {
-                fullActivityLog = fullActivityLog.filter(log => log.eventType !== 'FinishQuiz');
+                appState.fullActivityLog = appState.fullActivityLog.filter(log => log.eventType !== 'FinishQuiz');
             } else if (logType === 'lecture') {
-                fullActivityLog = fullActivityLog.filter(log => log.eventType !== 'ViewLecture');
+                appState.fullActivityLog = appState.fullActivityLog.filter(log => log.eventType !== 'ViewLecture');
             } else {
-                fullActivityLog = [];
+                appState.fullActivityLog = [];
             }
             renderFilteredLog('all');
             modalBackdrop.classList.add('hidden');
@@ -2091,7 +2414,7 @@
             loadingText.textContent = 'Loading your mistakes...';
             loadingText.classList.remove('hidden');
             try {
-                const response = await fetch(`${API_URL}?request=getIncorrectQuestions&userId=${currentUser.UniqueID}&t=${new Date().getTime()}`);
+                const response = await fetch(`${API_URL}?request=getIncorrectQuestions&userId=${appState.currentUser.UniqueID}&t=${new Date().getTime()}`);
                 if (!response.ok) throw new Error('Failed to fetch your mistakes.');
                 
                 const data = await response.json();
@@ -2119,7 +2442,7 @@
         function logIncorrectAnswer(questionId, userAnswer) {
             const payload = {
                 eventType: 'logIncorrectAnswer',
-                userId: currentUser.UniqueID,
+                userId: appState.currentUser.UniqueID,
                 questionId: questionId,
                 userAnswer: userAnswer
             };
@@ -2130,7 +2453,7 @@
         function logCorrectedMistake(questionId) {
             const payload = {
                 eventType: 'logCorrectedMistake',
-                userId: currentUser.UniqueID,
+                userId: appState.currentUser.UniqueID,
                 questionId: questionId
             };
             fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
@@ -2139,12 +2462,12 @@
 
         function displayAnnouncement() {
             const banner = document.getElementById('announcement-banner');
-            if (allAnnouncements.length === 0) {
+            if (appState.allAnnouncements.length === 0) {
                 banner.classList.add('hidden');
                 return;
             }
 
-            const latestAnnouncement = allAnnouncements[0];
+            const latestAnnouncement = appState.allAnnouncements[0];
             const seenAnnouncementId = localStorage.getItem('seenAnnouncementId');
             
             if (seenAnnouncementId === latestAnnouncement.UniqueID) {
@@ -2174,10 +2497,10 @@
         
         function showAnnouncementsModal() {
             announcementsList.innerHTML = '';
-            if (allAnnouncements.length === 0) {
+            if (appState.allAnnouncements.length === 0) {
                 announcementsList.innerHTML = `<p class="text-center text-slate-500">No announcements right now.</p>`;
             } else {
-                allAnnouncements.forEach(ann => {
+                appState.allAnnouncements.forEach(ann => {
                     const annItem = document.createElement('div');
                     annItem.className = 'p-3 border-b';
                     const date = new Date(ann.TimeStamp).toLocaleDateString('en-GB');
@@ -2192,6 +2515,445 @@
             announcementsModal.classList.remove('hidden');
         }
 
+        // --- OSCE Functions ---
+        function showOsceScreen() {
+            showScreen(osceContainer);
+            appState.navigationHistory.push(showOsceScreen);
+        }
+
+        function startOsceSlayer() {
+            const casesWithQuestions = appState.allOsceCases.filter(c => appState.allOsceQuestions.some(q => q.CaseID === c.CaseID));
+
+            if (casesWithQuestions.length === 0) {
+                osceError.textContent = "No OSCE cases with questions are available to start.";
+                osceError.classList.remove('hidden');
+                return;
+            }
+            const shuffled = [...casesWithQuestions].sort(() => Math.random() - 0.5);
+            
+            const totalQuestions = shuffled.reduce((acc, currentCase) => {
+                return acc + appState.allOsceQuestions.filter(q => q.CaseID === currentCase.CaseID).length;
+            }, 0);
+            
+            const totalDuration = totalQuestions * 60; // 1 minute per question
+            startOsceQuiz(shuffled, "OSCE Slayer", totalDuration);
+        }
+
+        function startCustomOsce() {
+            osceError.classList.add('hidden');
+            const requestedCount = parseInt(osceCaseCountInput.value, 10);
+            if (isNaN(requestedCount) || requestedCount <= 0) {
+                osceError.textContent = "Please enter a valid number of cases.";
+                osceError.classList.remove('hidden');
+                return;
+            }
+
+            const timePerQ = parseInt(osceTimePerQInput.value, 10) || 1; // Default to 1 minute
+            const timePerQSeconds = timePerQ * 60;
+
+            const selectedChapters = [...chapterSelectOsce.querySelectorAll('input:checked')].map(el => el.value);
+            const selectedSources = [...sourceSelectOsce.querySelectorAll('input:checked')].map(el => el.value);
+            
+            let filteredCases = appState.allOsceCases;
+            if (selectedChapters.length > 0) filteredCases = filteredCases.filter(c => selectedChapters.includes(c.Chapter));
+            if (selectedSources.length > 0) filteredCases = filteredCases.filter(c => selectedSources.includes(c.Source));
+
+            const casesWithQuestions = filteredCases.filter(c => appState.allOsceQuestions.some(q => q.CaseID === c.CaseID));
+
+            if (casesWithQuestions.length === 0) {
+                osceError.textContent = "No cases with questions match the selected filters.";
+                osceError.classList.remove('hidden');
+                return;
+            }
+            if (requestedCount > casesWithQuestions.length) {
+                osceError.textContent = `Only ${casesWithQuestions.length} cases match your filters.`;
+                osceError.classList.remove('hidden');
+                return;
+            }
+
+            const shuffled = [...casesWithQuestions].sort(() => Math.random() - 0.5);
+            const mockCases = shuffled.slice(0, requestedCount);
+
+            const totalQuestions = mockCases.reduce((acc, currentCase) => {
+                return acc + appState.allOsceQuestions.filter(q => q.CaseID === currentCase.CaseID).length;
+            }, 0);
+
+            const totalDuration = totalQuestions * timePerQSeconds;
+            startOsceQuiz(mockCases, "Custom OSCE", totalDuration);
+        }
+        
+        function startOsceQuiz(cases, title, totalDuration) {
+            appState.currentOsce.cases = cases;
+            appState.currentOsce.caseIndex = 0;
+            appState.currentOsce.questionIndex = 0;
+            appState.currentOsce.userAnswers = {};
+            appState.currentOsce.score = 0;
+            appState.currentOsce.totalQuestions = cases.reduce((acc, c) => acc + appState.allOsceQuestions.filter(q => q.CaseID === c.CaseID).length, 0);
+
+            showScreen(osceQuizContainer);
+            resultsContainer.classList.add('hidden'); // Hide results from previous quiz
+            osceQuizTitle.textContent = title;
+            startOsceTimer(totalDuration);
+            updateOsceScoreDisplay();
+            renderOsceQuestion();
+        }
+
+        function renderOsceQuestion() {
+            const { cases, caseIndex, questionIndex } = appState.currentOsce;
+            const currentCase = cases[caseIndex];
+            const caseQuestions = appState.allOsceQuestions.filter(q => q.CaseID === currentCase.CaseID);
+            const currentQuestion = caseQuestions[questionIndex];
+
+            if (!currentQuestion) {
+                console.error("OSCE Error: Could not find a question for the current case/index.", { case: currentCase, index: questionIndex });
+                handleOsceNext();
+                return;
+            }
+
+            // Render Case Info
+            osceCaseTitle.textContent = currentCase.Title;
+            osceCaseDescription.textContent = currentCase.CaseDescription;
+            osceCaseImageContainer.innerHTML = '';
+            if (currentCase.ImageURL) {
+                const img = document.createElement('img');
+                img.src = currentCase.ImageURL;
+                img.alt = 'Case Image';
+                img.className = 'max-h-64 rounded-lg mx-auto mb-4 cursor-pointer';
+                img.addEventListener('click', () => showImageModal(currentCase.ImageURL));
+                osceCaseImageContainer.appendChild(img);
+            }
+
+            // Render Question Info
+            osceProgressText.textContent = `Case ${caseIndex + 1}/${cases.length} - Question ${questionIndex + 1}/${caseQuestions.length}`;
+            osceQuestionText.textContent = currentQuestion.QuestionText;
+            osceQuestionImageContainer.innerHTML = '';
+            if (currentQuestion.ImageURL) {
+                const img = document.createElement('img');
+                img.src = currentQuestion.ImageURL;
+                img.alt = 'Question Image';
+                img.className = 'max-h-48 rounded-lg mx-auto mb-4 cursor-pointer';
+                img.addEventListener('click', () => showImageModal(currentQuestion.ImageURL));
+                osceQuestionImageContainer.appendChild(img);
+            }
+
+            // Render Answer Area
+            osceAnswerArea.innerHTML = '';
+            osceModelAnswerArea.innerHTML = '';
+            osceModelAnswerArea.classList.add('hidden');
+            osceSelfCorrectionArea.innerHTML = '';
+            osceSelfCorrectionArea.classList.add('hidden');
+            
+            const answerKey = `${currentCase.CaseID}_${currentQuestion.QuestionID}`;
+            const userAnswer = appState.currentOsce.userAnswers[answerKey];
+
+            if (currentQuestion.QuestionType === 'MCQ') {
+                const shuffledAnswers = [...currentQuestion.answerOptions].sort(() => Math.random() - 0.5);
+                shuffledAnswers.forEach(answer => {
+                    const button = document.createElement('button');
+                    button.textContent = answer.text;
+                    button.className = 'answer-btn w-full text-left p-4 rounded-lg bg-slate-100 hover:bg-slate-200 border-2 border-transparent';
+                    button.dataset.correct = answer.isCorrect;
+                    button.dataset.text = answer.text;
+                    button.addEventListener('click', () => selectOsceAnswer(answer));
+                    osceAnswerArea.appendChild(button);
+                });
+                if (userAnswer) {
+                    showOsceMcqResult();
+                }
+            } else { // Essay or default
+                if (userAnswer) {
+                    osceModelAnswerArea.innerHTML = `<p class="font-semibold">Model Answer:</p><p>${currentQuestion.EssayModelAnswer}</p>`;
+                    osceModelAnswerArea.classList.remove('hidden');
+                    osceSelfCorrectionArea.innerHTML = `<p class="text-center font-bold text-slate-600">You marked this as ${userAnswer.isCorrect ? 'Correct' : 'Incorrect'}.</p>`;
+                    osceSelfCorrectionArea.classList.remove('hidden');
+                } else {
+                    const showAnswerBtn = document.createElement('button');
+                    showAnswerBtn.textContent = 'Show Model Answer';
+                    showAnswerBtn.className = 'action-btn bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700';
+                    showAnswerBtn.onclick = () => {
+                        osceModelAnswerArea.innerHTML = `<p class="font-semibold">Model Answer:</p><p>${currentQuestion.EssayModelAnswer}</p>`;
+                        osceModelAnswerArea.classList.remove('hidden');
+                        showAnswerBtn.classList.add('hidden');
+                        osceSelfCorrectionArea.classList.remove('hidden');
+                        osceSelfCorrectionArea.innerHTML = `
+                            <p class="text-center font-semibold mb-2">Did you get it right?</p>
+                            <div class="flex justify-center gap-4">
+                                <button class="self-correct-btn action-btn bg-green-500 text-white font-bold py-2 px-4 rounded-lg" data-correct="true">Correct</button>
+                                <button class="self-correct-btn action-btn bg-red-500 text-white font-bold py-2 px-4 rounded-lg" data-correct="false">Incorrect</button>
+                            </div>
+                        `;
+                        osceSelfCorrectionArea.querySelectorAll('.self-correct-btn').forEach(btn => {
+                            btn.addEventListener('click', (e) => handleOsceSelfCorrection(e.target.dataset.correct === 'true'));
+                        });
+                    };
+                    osceAnswerArea.appendChild(showAnswerBtn);
+                }
+            }
+
+            // Update button states
+            oscePreviousBtn.disabled = caseIndex === 0 && questionIndex === 0;
+            osceNextBtn.textContent = (caseIndex === cases.length - 1 && questionIndex === caseQuestions.length - 1) ? 'Finish' : 'Next';
+        }
+
+        function selectOsceAnswer(selectedAnswer) {
+            const { cases, caseIndex, questionIndex } = appState.currentOsce;
+            const currentCase = cases[caseIndex];
+            const caseQuestions = appState.allOsceQuestions.filter(q => q.CaseID === currentCase.CaseID);
+            const currentQuestion = caseQuestions[questionIndex];
+            if (!currentQuestion) return;
+
+            const answerKey = `${currentCase.CaseID}_${currentQuestion.QuestionID}`;
+            if (appState.currentOsce.userAnswers[answerKey]) return; // Already answered
+
+            appState.currentOsce.userAnswers[answerKey] = { answer: selectedAnswer.text, isCorrect: selectedAnswer.isCorrect };
+            if (selectedAnswer.isCorrect) {
+                appState.currentOsce.score++;
+            }
+            updateOsceScoreDisplay();
+            showOsceMcqResult();
+        }
+
+        function showOsceMcqResult() {
+            const { cases, caseIndex, questionIndex, userAnswers } = appState.currentOsce;
+            const currentCase = cases[caseIndex];
+            const caseQuestions = appState.allOsceQuestions.filter(q => q.CaseID === currentCase.CaseID);
+            const currentQuestion = caseQuestions[questionIndex];
+            const answerKey = `${currentCase.CaseID}_${currentQuestion.QuestionID}`;
+            const userAnswer = userAnswers[answerKey];
+
+            Array.from(osceAnswerArea.querySelectorAll('.answer-btn')).forEach(button => {
+                button.disabled = true;
+                if (button.dataset.correct === 'true') {
+                    button.classList.add('correct');
+                } else if (userAnswer && button.dataset.text === userAnswer.answer) {
+                    button.classList.add('incorrect', 'user-choice');
+                }
+            });
+        }
+
+        function handleOsceSelfCorrection(isCorrect) {
+            const { cases, caseIndex, questionIndex } = appState.currentOsce;
+            const currentCase = cases[caseIndex];
+            const caseQuestions = appState.allOsceQuestions.filter(q => q.CaseID === currentCase.CaseID);
+            const currentQuestion = caseQuestions[questionIndex];
+            const answerKey = `${currentCase.CaseID}_${currentQuestion.QuestionID}`;
+
+            if (appState.currentOsce.userAnswers[answerKey]) return; // Already answered
+
+            appState.currentOsce.userAnswers[answerKey] = { answer: isCorrect ? 'Correct' : 'Incorrect', isCorrect: isCorrect };
+            if (isCorrect) {
+                appState.currentOsce.score++;
+            }
+            updateOsceScoreDisplay();
+            osceSelfCorrectionArea.innerHTML = `<p class="text-center font-bold text-slate-600">Your answer has been recorded.</p>`;
+        }
+
+        function updateOsceScoreDisplay() {
+            const { score, totalQuestions } = appState.currentOsce;
+            osceScoreDisplay.textContent = `Score: ${score}/${totalQuestions}`;
+        }
+
+        function startOsceTimer(durationInSeconds) {
+            clearInterval(appState.currentOsce.timerInterval);
+            let timeLeft = durationInSeconds;
+            osceTimer.textContent = formatTime(timeLeft);
+            appState.currentOsce.timerInterval = setInterval(() => {
+                timeLeft--;
+                osceTimer.textContent = formatTime(timeLeft);
+                if (timeLeft <= 0) {
+                    clearInterval(appState.currentOsce.timerInterval);
+                    endOsceQuiz(true); // Force end due to time up
+                }
+            }, 1000);
+        }
+
+        function handleOsceNext() {
+            const { cases, caseIndex, questionIndex } = appState.currentOsce;
+            const currentCase = cases[caseIndex];
+            const caseQuestions = appState.allOsceQuestions.filter(q => q.CaseID === currentCase.CaseID);
+
+            if (questionIndex < caseQuestions.length - 1) {
+                appState.currentOsce.questionIndex++;
+            } else if (caseIndex < cases.length - 1) {
+                appState.currentOsce.caseIndex++;
+                appState.currentOsce.questionIndex = 0;
+            } else {
+                endOsceQuiz(true); // Force end as it's the last question
+                return;
+            }
+            renderOsceQuestion();
+        }
+
+        function handleOscePrevious() {
+            if (appState.currentOsce.questionIndex > 0) {
+                appState.currentOsce.questionIndex--;
+            } else if (appState.currentOsce.caseIndex > 0) {
+                appState.currentOsce.caseIndex--;
+                const prevCase = appState.currentOsce.cases[appState.currentOsce.caseIndex];
+                const prevCaseQuestions = appState.allOsceQuestions.filter(q => q.CaseID === prevCase.CaseID);
+                appState.currentOsce.questionIndex = prevCaseQuestions.length - 1;
+            }
+            renderOsceQuestion();
+        }
+
+        function endOsceQuiz(isForced = false) {
+            clearInterval(appState.currentOsce.timerInterval);
+            if (isForced) {
+                showOsceResults();
+            } else {
+                showConfirmationModal('End OSCE?', 'Are you sure you want to end this OSCE session?', () => {
+                    modalBackdrop.classList.add('hidden');
+                    showOsceResults();
+                });
+            }
+        }
+
+        function showOsceResults() {
+            // *** FIX: Use showScreen to correctly display the quiz container which holds the results ***
+            showScreen(quizContainer);
+            
+            // Now hide the parts of the quiz container we don't need for the results page
+            questionContainer.classList.add('hidden');
+            controlsContainer.classList.add('hidden');
+            
+            // Show the results container itself
+            resultsContainer.classList.remove('hidden');
+            
+            // Populate results
+            resultsTitle.textContent = "OSCE Complete!";
+            resultsScoreText.innerHTML = `Your score is <span id="score-text" class="font-bold">${appState.currentOsce.score}</span> out of <span id="total-questions" class="font-bold">${appState.currentOsce.totalQuestions}</span>.`;
+            
+            // Hide buttons not applicable to OSCE results
+            restartBtn.classList.add('hidden'); 
+            reviewIncorrectBtn.classList.add('hidden'); 
+        }
+
+        function showOsceNavigator() {
+            osceNavigatorContent.innerHTML = '';
+            appState.currentOsce.cases.forEach((caseItem, caseIdx) => {
+                const caseDiv = document.createElement('div');
+                caseDiv.className = 'border-b pb-2';
+                const caseTitle = document.createElement('h4');
+                caseTitle.className = 'font-bold text-slate-700';
+                caseTitle.textContent = `Case ${caseIdx + 1}: ${caseItem.Title}`;
+                caseDiv.appendChild(caseTitle);
+
+                const questionsGrid = document.createElement('div');
+                questionsGrid.className = 'grid grid-cols-5 sm:grid-cols-8 gap-2 mt-2';
+                
+                const caseQuestions = appState.allOsceQuestions.filter(q => q.CaseID === caseItem.CaseID);
+                caseQuestions.forEach((q, qIdx) => {
+                    const button = document.createElement('button');
+                    button.textContent = qIdx + 1;
+                    button.className = 'navigator-btn w-10 h-10 rounded-md font-semibold flex items-center justify-center';
+                    const answerKey = `${caseItem.CaseID}_${q.QuestionID}`;
+                    const answer = appState.currentOsce.userAnswers[answerKey];
+
+                    if (!answer) {
+                        button.classList.add('unanswered');
+                    } else if (answer.isCorrect) {
+                        button.classList.add('correct');
+                    } else {
+                        button.classList.add('incorrect');
+                    }
+
+                    button.addEventListener('click', () => {
+                        appState.currentOsce.caseIndex = caseIdx;
+                        appState.currentOsce.questionIndex = qIdx;
+                        renderOsceQuestion();
+                        modalBackdrop.classList.add('hidden');
+                    });
+                    questionsGrid.appendChild(button);
+                });
+                caseDiv.appendChild(questionsGrid);
+                osceNavigatorContent.appendChild(caseDiv);
+            });
+
+            modalBackdrop.classList.remove('hidden');
+            osceNavigatorModal.classList.remove('hidden');
+        }
+
+        // --- ADDED: Learning Mode Functions ---
+        function showLearningModeBrowseScreen() {
+            showScreen(learningModeContainer);
+            learningModeControls.classList.remove('hidden');
+            learningModeViewer.classList.add('hidden');
+            appState.navigationHistory.push(showLearningModeBrowseScreen);
+        }
+
+        function launchLearningMode(title, questions) {
+            appState.currentLearning.questions = questions;
+            appState.currentLearning.currentIndex = 0;
+            appState.currentLearning.title = title;
+            
+            learningModeControls.classList.add('hidden');
+            learningModeViewer.classList.remove('hidden');
+            learningTitle.textContent = `Studying: ${title}`;
+
+            showLearningQuestion();
+        }
+
+        function showLearningQuestion() {
+            const { questions, currentIndex } = appState.currentLearning;
+            const currentQuestion = questions[currentIndex];
+
+            learningImageContainer.innerHTML = '';
+            if (currentQuestion.ImageURL) {
+                const img = document.createElement('img');
+                img.src = currentQuestion.ImageURL;
+                img.alt = 'Question Image';
+                img.className = 'max-h-48 rounded-lg mx-auto mb-4 cursor-pointer hover:opacity-80 transition-opacity';
+                img.addEventListener('click', () => showImageModal(currentQuestion.ImageURL));
+                learningImageContainer.appendChild(img);
+            }
+
+            learningQuestionText.textContent = currentQuestion.question;
+            learningProgressText.textContent = `Question ${currentIndex + 1} of ${questions.length}`;
+            learningSourceText.textContent = `Source: ${currentQuestion.source || 'N/A'} | Chapter: ${currentQuestion.chapter || 'N/A'}`;
+            
+            learningAnswerButtons.innerHTML = '';
+            currentQuestion.answerOptions.forEach(answer => {
+                const answerDiv = document.createElement('div');
+                const button = document.createElement('button');
+                button.textContent = answer.text;
+                button.className = 'learning-answer-btn w-full text-left p-4 rounded-lg';
+                button.disabled = true;
+
+                if (answer.isCorrect) {
+                    button.classList.add('correct');
+                    const rationale = document.createElement('p');
+                    rationale.className = 'learning-rationale';
+                    rationale.textContent = answer.rationale || 'No rationale provided for this answer.';
+                    answerDiv.appendChild(button);
+                    answerDiv.appendChild(rationale);
+                } else {
+                    answerDiv.appendChild(button);
+                }
+                
+                learningAnswerButtons.appendChild(answerDiv);
+            });
+
+            learningPreviousBtn.disabled = currentIndex === 0;
+            learningPreviousBtn.classList.toggle('opacity-50', currentIndex === 0);
+
+            learningNextBtn.disabled = currentIndex === questions.length - 1;
+            learningNextBtn.classList.toggle('opacity-50', currentIndex === questions.length - 1);
+        }
+
+        function handleLearningNext() {
+            if (appState.currentLearning.currentIndex < appState.currentLearning.questions.length - 1) {
+                appState.currentLearning.currentIndex++;
+                showLearningQuestion();
+            }
+        }
+
+        function handleLearningPrevious() {
+            if (appState.currentLearning.currentIndex > 0) {
+                appState.currentLearning.currentIndex--;
+                showLearningQuestion();
+            }
+        }
+
 
         // --- EVENT LISTENERS ---
         loginForm.addEventListener('submit', handleLogin);
@@ -2202,6 +2964,10 @@
         notesBtn.addEventListener('click', showNotesScreen);
         leaderboardBtn.addEventListener('click', showLeaderboardScreen);
         announcementsBtn.addEventListener('click', showAnnouncementsModal);
+        osceBtn.addEventListener('click', showOsceScreen);
+        
+        // ADDED: Learning Mode Button Listener
+        learningModeBtn.addEventListener('click', showLearningModeBrowseScreen);
         
         lecturesBackBtn.addEventListener('click', handleBackNavigation);
         qbankBackBtn.addEventListener('click', handleBackNavigation);
@@ -2210,11 +2976,15 @@
         libraryBackBtn.addEventListener('click', handleBackNavigation);
         notesBackBtn.addEventListener('click', handleBackNavigation);
         leaderboardBackBtn.addEventListener('click', handleBackNavigation);
+        osceBackBtn.addEventListener('click', handleBackNavigation);
+        
+        // ADDED: Learning Mode Back Button
+        learningModeBackBtn.addEventListener('click', handleBackNavigation);
 
         globalHomeBtn.addEventListener('click', () => {
-            if (currentUser && currentUser.Role === 'Guest') {
+            if (appState.currentUser && appState.currentUser.Role === 'Guest') {
                 showScreen(loginContainer);
-                currentUser = null;
+                appState.currentUser = null;
             } else {
                 showMainMenuScreen();
             }
@@ -2232,8 +3002,8 @@
         lectureSearchInput.addEventListener('keyup', (e) => renderLectures(e.target.value));
 
         startMockBtn.addEventListener('click', handleMockExamStart);
-        browseByChapterBtn.addEventListener('click', () => showChapterList('All'));
-        browseBySourceBtn.addEventListener('click', showSourceList);
+        browseByChapterBtn.addEventListener('click', () => showChapterList('All', false));
+        browseBySourceBtn.addEventListener('click', () => showSourceList(false));
         toggleCustomOptionsBtn.addEventListener('click', () => customExamOptions.classList.toggle('visible'));
         practiceMistakesBtn.addEventListener('click', startIncorrectQuestionsQuiz);
 
@@ -2242,11 +3012,11 @@
         endQuizBtn.addEventListener('click', triggerEndQuiz);
         previousBtn.addEventListener('click', handlePreviousQuestion);
         nextSkipBtn.addEventListener('click', handleNextQuestion);
-        restartBtn.addEventListener('click', () => launchQuiz(originalQuizQuestions, quizTitle.textContent.replace('Review: ', '')));
+        restartBtn.addEventListener('click', () => launchQuiz(appState.currentQuiz.originalQuestions, quizTitle.textContent.replace('Review: ', '')));
         resultsHomeBtn.addEventListener('click', () => {
-            if (currentUser.Role === 'Guest') {
+            if (appState.currentUser.Role === 'Guest') {
                 showScreen(loginContainer);
-                currentUser = null;
+                appState.currentUser = null;
             } else {
                 showMainMenuScreen();
             }
@@ -2254,12 +3024,29 @@
         reviewIncorrectBtn.addEventListener('click', startIncorrectReview);
 
         quizNoteBtn.addEventListener('click', () => {
-            const currentQuestion = currentQuizQuestions[currentQuestionIndex];
+            const currentQuestion = appState.currentQuiz.questions[appState.currentQuiz.currentQuestionIndex];
             openNoteModal('quiz', currentQuestion.UniqueID, currentQuestion.question);
         });
 
+        // OSCE Listeners
+        toggleOsceOptionsBtn.addEventListener('click', () => customOsceOptions.classList.toggle('visible'));
+        startOsceSlayerBtn.addEventListener('click', startOsceSlayer);
+        startCustomOsceBtn.addEventListener('click', startCustomOsce);
+        endOsceQuizBtn.addEventListener('click', () => endOsceQuiz(false));
+        osceNextBtn.addEventListener('click', handleOsceNext);
+        oscePreviousBtn.addEventListener('click', handleOscePrevious);
+        osceNavigatorBtn.addEventListener('click', showOsceNavigator);
+        osceNavigatorCloseBtn.addEventListener('click', () => modalBackdrop.classList.add('hidden'));
+
+        // ADDED: Learning Mode Listeners
+        learningBrowseByChapterBtn.addEventListener('click', () => showChapterList('All', true));
+        learningBrowseBySourceBtn.addEventListener('click', () => showSourceList(true));
+        endLearningBtn.addEventListener('click', showLearningModeBrowseScreen);
+        learningNextBtn.addEventListener('click', handleLearningNext);
+        learningPreviousBtn.addEventListener('click', handleLearningPrevious);
+
         modalCancelBtn.addEventListener('click', () => modalBackdrop.classList.add('hidden'));
-        modalConfirmBtn.addEventListener('click', () => { if (modalConfirmAction) modalConfirmAction(); });
+        modalConfirmBtn.addEventListener('click', () => { if (appState.modalConfirmAction) appState.modalConfirmAction(); });
         navigatorBtn.addEventListener('click', showQuestionNavigator);
         navigatorCloseBtn.addEventListener('click', () => modalBackdrop.classList.add('hidden'));
         imageViewerCloseBtn.addEventListener('click', () => modalBackdrop.classList.add('hidden'));
@@ -2275,7 +3062,7 @@
         
         clearLogBtn.addEventListener('click', () => {
             modalBackdrop.classList.remove('hidden');
-            clearLogModal.classList.remove('hidden');
+            clearLogModal.classList.add('hidden');
         });
         clearLogCancelBtn.addEventListener('click', () => {
             modalBackdrop.classList.add('hidden');
@@ -2285,6 +3072,14 @@
         clearLectureLogsBtn.addEventListener('click', () => handleClearLogs('lecture'));
         clearAllLogsBtn.addEventListener('click', () => handleClearLogs('all'));
         
+        // Radio Banner Listeners
+        radioBtn.addEventListener('click', () => {
+            radioBannerContainer.classList.toggle('open');
+        });
+        radioCloseBtn.addEventListener('click', () => {
+            radioBannerContainer.classList.remove('open');
+        });
+        
         // --- INITIAL LOAD ---
         loadContentData();
     });
@@ -2292,3 +3087,4 @@
 
 </body>
 </html>
+```
