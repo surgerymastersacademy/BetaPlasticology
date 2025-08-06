@@ -1,33 +1,3 @@
-Of course\! I can help you with that. Creating a "Learning Mode" that displays questions and their answers directly is an excellent way to turn your question bank into a powerful study tool.
-
-Here is the plan:
-
-1.  **Create the HTML Structure:** We'll add a new `div` for the Learning Mode screen, which will be very similar to the existing `quiz-container`.
-2.  **Add the Main Menu Button Logic:** We'll make the "Learning Mode" button on the main menu functional.
-3.  **Implement the Core JavaScript:** We'll write the JavaScript functions to:
-      * Show and hide the new screen.
-      * Allow users to select which questions they want to study (e.g., by chapter or source, just like the Question Bank).
-      * Display one question at a time with the correct answer and rationale already visible.
-      * Include "Next" and "Previous" buttons to navigate through the questions.
-
-Let's get started\!
-
-### 1\. Updated HTML Code
-
-I've added the new HTML structure for the learning mode screen and the JavaScript to power it.
-
-**Key Changes:**
-
-  * **\`\`**: A new `div` with the ID \`learning-mode-container\` has been added. This container is a modified version of the \`quiz-container\`, designed to show the question and answer simultaneously.
-  * **New JavaScript Functions**:
-      * `showLearningModeBrowseScreen()`: This function displays the initial screen for the Learning Mode, allowing users to choose how they want to browse questions (similar to the question bank).
-      * `launchLearningMode()`: Starts the learning session with the selected questions.
-      * `showLearningQuestion()`: Renders a single question with its correct answer and rationale visible by default.
-  * **Event Listeners**: Added event listeners for the new buttons to make them functional.
-
-Copy and paste the entire code block below into your HTML file.
-
-```html
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
@@ -3087,4 +3057,3 @@ Copy and paste the entire code block below into your HTML file.
 
 </body>
 </html>
-```
