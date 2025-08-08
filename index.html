@@ -4,11 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plasticology Ultimate Edition</title>
+    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for a clean look -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for activity graph -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Custom styles */
@@ -98,6 +102,7 @@
         .rationale { visibility: hidden; opacity: 0; max-height: 0; transition: all 0.3s ease-in-out; overflow: hidden; }
         .rationale.visible { visibility: visible; opacity: 1; max-height: 150px; }
         .flag-btn.flagged { color: #f59e0b; }
+        .bookmark-btn.bookmarked { color: #3b82f6; } /* Blue for bookmarked */
         .navigator-btn { position: relative; border: 2px solid transparent; }
         .navigator-btn.unanswered { background-color: #e5e7eb; border-color: #d1d5db; }
         .navigator-btn.correct { background-color: #d1fae5; border-color: #6ee7b7; }
@@ -144,18 +149,25 @@
 </head>
 <body class="flex items-center justify-center min-h-screen p-2 sm:p-4">
 
+    <!-- Main container for the entire app -->
     <div class="main-app-container">
+        <!-- ADDED: Watermark Overlay -->
         <div id="watermark-overlay" class="hidden">
-            </div>
+            <!-- Watermark items will be injected here by JS -->
+        </div>
 
+        <!-- Global header with fixed title and home button -->
         <header id="global-header" class="p-4 md:p-6 bg-slate-800 text-white flex justify-between items-center hidden">
             <a href="https://www.surgerymastersacademy.com" target="_blank" title="Back to Main Website">
                 <img id="header-logo" src="https://raw.githubusercontent.com/doctorbishoy/Plasticology-/main/Plasticology%202025%20Logo%20white%20outline.png" alt="Logo" class="h-10">
             </a>
             <div class="flex items-center gap-4">
                 <span id="user-name-display" class="text-base font-medium text-slate-200 hidden sm:block"></span>
-                <button id="radio-btn" class="text-white hover:text-slate-300 transition-colors text-2xl" title="Plasticology Radio" aria-label="Plasticology Radio">
-                    <i class="fas fa-broadcast-tower"></i>
+                <!-- MODIFIED: Radio Button Icon -->
+                <button id="radio-btn" class="text-white hover:text-slate-300 transition-colors" title="Plasticology Radio" aria-label="Plasticology Radio">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m3.75 7.5 16.5-4.125M12 6.75c-2.708 0-5.363.224-7.948.655C2.999 7.58 2.25 8.507 2.25 9.574v9.176A2.25 2.25 0 0 0 4.5 21h15a2.25 2.25 0 0 0 2.25-2.25V9.574c0-1.067-.75-1.994-1.802-2.169A48.329 48.329 0 0 0 12 6.75Zm-1.683 6.443-.005.005-.006-.005.006-.005.005.005Zm-.005 2.127-.005-.006.005-.005.005.005-.005.005Zm-2.116-.006-.005.006-.006-.006.005-.005.006.005Zm-.005-2.116-.006-.005.006-.005.005.005-.005.005ZM9.255 10.5v.008h-.008V10.5h.008Zm3.249 1.88-.007.004-.003-.007.006-.003.004.006Zm-1.38 5.126-.003-.006.006-.004.004.007-.006.003Zm.007-6.501-.003.006-.007-.003.004-.007.006.004Zm1.37 5.129-.007-.004.004-.006.006.003-.004.007Zm.504-1.877h-.008v-.007h.008v.007ZM9.255 18v.008h-.008V18h.008Zm-3.246-1.87-.007.004L6 16.127l.006-.003.004.006Zm1.366-5.119-.004-.006.006-.004.004.007-.006.003ZM7.38 17.5l-.003.006-.007-.003.004-.007.006.004Zm-1.376-5.116L6 12.38l.003-.007.007.004-.004.007Zm-.5 1.873h-.008v-.007h.008v.007ZM17.25 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Zm0 4.5a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
+                    </svg>
                 </button>
                 <button id="announcements-btn" class="text-white hover:text-slate-300 transition-colors text-2xl" title="Announcements" aria-label="Announcements">
                     <i class="fas fa-bullhorn"></i>
@@ -176,6 +188,7 @@
             </div>
         </header>
 
+        <!-- ADDED: Radio Player Banner -->
         <div id="radio-banner-container" class="max-h-0 overflow-hidden transition-all duration-500 ease-in-out bg-slate-100">
             <div class="p-2 bg-slate-700 text-white flex justify-between items-center">
                 <div class="flex items-center gap-2">
@@ -187,7 +200,9 @@
             <iframe src="https://plasticologyradio.surgerymastersacademy.com/" class="w-full h-64 border-0" title="Plasticology Radio"></iframe>
         </div>
 
+        <!-- Main content area where screens are swapped -->
         <main id="main-content">
+            <!-- Login Screen -->
             <div id="login-container" class="w-full max-w-md mx-auto">
                 <div class="p-8">
                     <a href="https://www.surgerymastersacademy.com" target="_blank" title="Go to Main Website">
@@ -231,6 +246,7 @@
                 </div>
             </div>
             
+            <!-- Main Menu Screen -->
             <div id="main-menu-container" class="w-full hidden">
                 <div class="p-6 md:p-8">
                     <div id="announcement-banner" class="hidden"></div>
@@ -248,8 +264,13 @@
                         </button>
                         <button id="qbank-btn" class="main-menu-btn flex flex-col items-center justify-center p-8 rounded-xl text-white bg-gradient-to-r from-indigo-500 to-purple-600">
                             <i class="fas fa-question-circle text-5xl mb-4"></i>
-                            <span class="text-2xl font-bold">Question Bank</span>
+                            <span class="text-2xl font-bold">Exam Mode</span>
                             <span class="font-light">Test Your Knowledge</span>
+                        </button>
+                        <button id="learning-mode-btn" class="main-menu-btn flex flex-col items-center justify-center p-8 rounded-xl text-white bg-gradient-to-r from-green-500 to-emerald-600">
+                            <i class="fas fa-book-reader text-5xl mb-4"></i>
+                            <span class="text-2xl font-bold">Learning Mode</span>
+                            <span class="font-light">Study Questions</span>
                         </button>
                         <button id="osce-btn" class="main-menu-btn flex flex-col items-center justify-center p-8 rounded-xl text-white bg-gradient-to-r from-sky-500 to-blue-600">
                             <i class="fas fa-user-md text-5xl mb-4"></i>
@@ -266,20 +287,17 @@
                             <span class="text-2xl font-bold">Leaderboard</span>
                             <span class="font-light">Top 10 Users</span>
                         </button>
-                        <button id="learning-mode-btn" class="main-menu-btn flex flex-col items-center justify-center p-8 rounded-xl text-white bg-gradient-to-r from-green-500 to-emerald-600">
-                            <i class="fas fa-book-reader text-5xl mb-4"></i>
-                            <span class="text-2xl font-bold">Learning Mode</span>
-                            <span class="font-light">Study Questions</span>
-                        </button>
                     </div>
                 </div>
             </div>
 
+            <!-- Library Screen -->
             <div id="library-container" class="w-full hidden">
                 <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
                     <button id="library-back-btn" class="text-slate-700 hover:text-blue-600 transition-colors" title="Back"><i class="fas fa-arrow-left"></i> Back</button>
                     <h2 class="text-xl md:text-2xl font-bold text-slate-800">Resource Library</h2>
-                    <div class="w-16"></div> </div>
+                    <div class="w-16"></div> <!-- Spacer -->
+                </div>
                 <div class="p-4 md:p-6">
                     <div id="library-loader" class="loader hidden"></div>
                     <div id="library-list" class="space-y-4">
@@ -287,24 +305,29 @@
                 </div>
             </div>
 
+            <!-- Leaderboard Screen -->
             <div id="leaderboard-container" class="w-full hidden">
                 <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
                     <button id="leaderboard-back-btn" class="text-slate-700 hover:text-blue-600 transition-colors" title="Back"><i class="fas fa-arrow-left"></i> Back</button>
                     <h2 class="text-xl md:text-2xl font-bold text-slate-800">Top 10 Champions</h2>
-                    <div class="w-16"></div> </div>
+                    <div class="w-16"></div> <!-- Spacer -->
+                </div>
                 <div class="p-4 md:p-6">
                     <div id="leaderboard-loader" class="loader hidden"></div>
                     <div id="current-user-rank" class="mb-6"></div> 
                     <div id="leaderboard-list" class="space-y-3">
-                        </div>
+                        <!-- Leaderboard will be injected here -->
+                    </div>
                 </div>
             </div>
 
+            <!-- Lectures Screen -->
             <div id="lectures-container" class="w-full hidden">
                 <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
                     <button id="lectures-back-btn" class="text-slate-700 hover:text-blue-600 transition-colors" title="Back"><i class="fas fa-arrow-left"></i> Back</button>
                     <h2 class="text-xl md:text-2xl font-bold text-slate-800">Lectures</h2>
-                    <div class="w-16"></div> </div>
+                    <div class="w-16"></div> <!-- Spacer -->
+                </div>
                 <div class="p-4 md:p-6">
                     <div class="relative mb-6">
                         <input type="text" id="lecture-search-input" placeholder="Search by chapter or topic..." class="w-full p-3 pl-10 border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
@@ -316,33 +339,72 @@
                 </div>
             </div>
 
+            <!-- Question Bank Home Screen -->
             <div id="qbank-container" class="w-full hidden">
                  <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
                     <button id="qbank-back-btn" class="text-slate-700 hover:text-blue-600 transition-colors" title="Back"><i class="fas fa-arrow-left"></i> Back</button>
                     <h2 class="text-xl md:text-2xl font-bold text-slate-800">Question Bank</h2>
-                    <div class="w-16"></div> </div>
-                <div id="qbank-controls">
-                    <div class="p-6 md:p-8 border-b border-slate-200">
-                        <div id="loader" class="loader hidden"></div>
-                        <p id="loading-text" class="text-slate-500 mt-2 text-center hidden">Loading questions...</p>
-                        <h3 class="text-xl font-bold text-slate-800 mb-4">Create a Mock Exam</h3>
+                    <div class="w-16"></div> <!-- Spacer -->
+                </div>
+                <div id="qbank-controls" class="p-4 md:p-8 space-y-6">
+                    <!-- Search Card -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center"><i class="fas fa-search text-indigo-500 mr-3"></i>Search for a Topic</h3>
+                        <p class="text-slate-500 text-sm mb-4">Find questions related to a specific topic to start a quick quiz.</p>
                         <div class="flex flex-col sm:flex-row items-center gap-4">
-                            <input type="number" id="mock-q-count" class="shadow appearance-none border rounded w-full sm:w-1/3 py-2 px-3 text-slate-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="# of Qs" min="1">
-                            <input type="number" id="custom-timer-input" class="shadow appearance-none border rounded w-full sm:w-1/3 py-2 px-3 text-slate-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Time/Q (sec)" min="5">
-                            <button id="toggle-custom-options-btn" class="action-btn w-full sm:w-auto bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg">
-                                Customize
+                            <input type="text" id="qbank-search-input" class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-slate-700 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g., Flaps, Burns...">
+                            <button id="qbank-search-btn" class="action-btn w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">
+                                Search
                             </button>
                         </div>
+                        <p id="qbank-search-error" class="text-red-500 text-xs italic mt-2 hidden"></p>
+                        <div id="qbank-search-results-container" class="mt-6 hidden">
+                            <p id="qbank-search-results-info" class="text-center text-slate-600 font-semibold mb-4"></p>
+                            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                                <input type="number" id="qbank-search-q-count" class="shadow-sm appearance-none border rounded w-full sm:w-1/3 py-2 px-3 text-slate-700 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="# of Qs (optional)">
+                                <button id="qbank-start-search-quiz-btn" class="action-btn w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-lg">
+                                    Start Quiz
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mock Exam Card -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <div id="loader" class="loader hidden"></div>
+                        <p id="loading-text" class="text-slate-500 mt-2 text-center hidden">Loading questions...</p>
+                        <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center"><i class="fas fa-tasks text-emerald-500 mr-3"></i>Create a Mock Exam</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="relative">
+                                <i class="fas fa-list-ol absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                <input type="number" id="mock-q-count" class="shadow-sm appearance-none border rounded w-full py-2 pl-10 pr-3 text-slate-700 leading-tight focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="# of Qs" min="1">
+                            </div>
+                            <div class="relative">
+                                <i class="fas fa-clock absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                <input type="number" id="custom-timer-input" class="shadow-sm appearance-none border rounded w-full py-2 pl-10 pr-3 text-slate-700 leading-tight focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Time/Q (sec)" min="5">
+                            </div>
+                        </div>
+                        <button id="toggle-custom-options-btn" class="action-btn w-full mt-4 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-4 rounded-lg">
+                            Customize (Chapters & Sources) <i class="fas fa-chevron-down ml-2 transition-transform"></i>
+                        </button>
                         <div id="custom-exam-options" class="custom-exam-options mt-4">
                              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                  <div>
                                      <label for="chapter-select-mock" class="block text-sm font-medium text-slate-700 mb-2">Filter by Chapters (optional)</label>
+                                      <div class="flex items-center p-2 border-b">
+                                        <input id="select-all-chapters-mock" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                        <label for="select-all-chapters-mock" class="ml-3 font-bold text-gray-700">Select All</label>
+                                     </div>
                                      <div id="chapter-select-mock" class="filter-container space-y-2">
                                          <p class="text-slate-400">Loading chapters...</p>
                                      </div>
                                  </div>
                                  <div>
                                      <label for="source-select-mock" class="block text-sm font-medium text-slate-700 mb-2">Filter by Sources (optional)</label>
+                                     <div class="flex items-center p-2 border-b">
+                                        <input id="select-all-sources-mock" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                        <label for="select-all-sources-mock" class="ml-3 font-bold text-gray-700">Select All</label>
+                                     </div>
                                      <div id="source-select-mock" class="filter-container space-y-2">
                                          <p class="text-slate-400">Loading sources...</p>
                                      </div>
@@ -354,22 +416,30 @@
                         </button>
                         <p id="mock-error" class="text-red-500 text-xs italic mt-2 hidden"></p>
                     </div>
-                    <div class="p-6 md:p-8">
-                        <h3 class="text-xl font-bold text-slate-800 mb-4">Browse Questions</h3>
+
+                    <!-- Browse & Practice Card -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center"><i class="fas fa-book-open-reader text-purple-500 mr-3"></i>Browse & Practice</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <button id="browse-by-chapter-btn" class="action-btn w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">Browse by Chapter</button>
-                            <button id="browse-by-source-btn" class="action-btn w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg">Browse by Source</button>
+                            <button id="browse-by-chapter-btn" class="action-btn w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-3 px-6 rounded-lg">Browse by Chapter</button>
+                            <button id="browse-by-source-btn" class="action-btn w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-3 px-6 rounded-lg">Browse by Source</button>
+                            <button id="practice-mistakes-btn" class="action-btn w-full bg-orange-100 hover:bg-orange-200 text-orange-800 font-bold py-3 px-6 rounded-lg">Practice Mistakes</button>
+                            <button id="practice-bookmarked-btn" class="action-btn w-full bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold py-3 px-6 rounded-lg">Practice Bookmarked</button>
                         </div>
-                        <button id="practice-mistakes-btn" class="action-btn w-full mt-4 bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg">Practice Mistakes</button>
                     </div>
                 </div>
             </div>
             
+            <!-- =============================================================== -->
+            <!-- ================ OSCE SCREENS (شاشات الأوسكي) ================= -->
+            <!-- =============================================================== -->
+            <!-- OSCE Bank Home Screen -->
             <div id="osce-container" class="w-full hidden">
                 <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
                     <button id="osce-back-btn" class="text-slate-700 hover:text-blue-600 transition-colors" title="Back"><i class="fas fa-arrow-left"></i> Back</button>
                     <h2 class="text-xl md:text-2xl font-bold text-slate-800">OSCE Bank</h2>
-                    <div class="w-16"></div> </div>
+                    <div class="w-16"></div> <!-- Spacer -->
+                </div>
                 <div id="osce-controls">
                     <div class="p-6 md:p-8 border-b border-slate-200">
                         <h3 class="text-2xl font-bold text-slate-800 mb-2 text-center">OSCE Slayer</h3>
@@ -411,6 +481,7 @@
                 </div>
             </div>
 
+            <!-- OSCE Quiz Screen -->
             <div id="osce-quiz-container" class="w-full hidden flex flex-col h-full">
                  <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center flex-shrink-0">
                     <div class="flex items-center gap-4">
@@ -423,19 +494,23 @@
                     </div>
                 </div>
                 <div class="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4 p-4 overflow-y-auto">
+                    <!-- Left Column: Case Details -->
                     <div class="bg-slate-50 p-4 rounded-lg flex flex-col">
                         <h3 id="osce-case-title" class="text-xl font-bold text-slate-800 mb-2"></h3>
                         <div id="osce-case-image-container" class="mb-2 text-center flex-grow flex items-center justify-center">
-                             </div>
+                             <!-- Case image will be injected here -->
+                        </div>
                         <p id="osce-case-description" class="text-sm text-slate-600"></p>
                     </div>
+                    <!-- Right Column: Question -->
                     <div class="flex flex-col">
                         <p id="osce-progress-text" class="font-semibold text-slate-600 text-center mb-2"></p>
                         <div class="bg-white p-4 rounded-lg border flex-grow flex flex-col">
                             <div id="osce-question-image-container" class="mb-4 text-center"></div>
                             <h3 id="osce-question-text" class="text-lg font-semibold text-slate-800 mb-4"></h3>
                             <div id="osce-answer-area" class="space-y-3 flex-grow">
-                                </div>
+                                <!-- Answer options (MCQ/Essay) will be injected here -->
+                            </div>
                             <div id="osce-model-answer-area" class="mt-4 hidden p-3 bg-gray-100 rounded"></div>
                             <div id="osce-self-correction-area" class="mt-4 hidden"></div>
                             <div id="osce-controls-container" class="mt-4 flex justify-between items-center">
@@ -448,19 +523,23 @@
                 </div>
             </div>
 
+            <!-- List Screen (for Chapters or Sources) -->
             <div id="list-container" class="w-full hidden">
                  <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
                     <button id="list-back-btn" class="text-slate-700 hover:text-blue-600 transition-colors" title="Back"><i class="fas fa-arrow-left"></i> Back</button>
                     <h2 id="list-title" class="text-xl md:text-2xl font-bold text-slate-800"></h2>
-                    <div class="w-16"></div> </div>
+                    <div class="w-16"></div> <!-- Spacer -->
+                </div>
                 <div id="list-items" class="p-4 md:p-6 grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4"></div>
             </div>
 
+            <!-- My Notes Screen -->
             <div id="notes-container" class="w-full hidden">
                 <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
                     <button id="notes-back-btn" class="text-slate-700 hover:text-blue-600 transition-colors" title="Back"><i class="fas fa-arrow-left"></i> Back</button>
                     <h2 class="text-xl md:text-2xl font-bold text-slate-800">My Notes</h2>
-                    <div class="w-16"></div> </div>
+                    <div class="w-16"></div> <!-- Spacer -->
+                </div>
                 <div class="p-6 md:p-8">
                     <div class="mb-4 p-1 bg-slate-200 rounded-lg flex justify-center gap-1">
                         <button id="notes-filter-quizzes" class="filter-btn flex-1 py-2 px-4 rounded-md text-sm font-semibold transition-colors">Quiz Notes</button>
@@ -471,6 +550,7 @@
                 </div>
             </div>
 
+            <!-- Activity Log Screen -->
             <div id="activity-log-container" class="w-full hidden">
                 <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
                     <button id="activity-back-btn" class="text-slate-700 hover:text-blue-600 transition-colors" title="Back"><i class="fas fa-arrow-left"></i> Back</button>
@@ -530,6 +610,7 @@
                 </div>
             </div>
 
+            <!-- Quiz Screen -->
             <div id="quiz-container" class="w-full hidden">
                  <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
                     <div class="flex items-center gap-4">
@@ -564,6 +645,7 @@
                         <button id="previous-btn" class="bg-slate-300 text-slate-800 font-bold py-3 px-6 rounded-lg hover:bg-slate-400 transition-colors action-btn">Previous</button>
                         <div class="flex items-center gap-4">
                              <button id="navigator-btn" class="text-2xl text-slate-500 hover:text-blue-600 transition-colors" title="Question Navigator" aria-label="Question Navigator"><i class="fas fa-th"></i></button>
+                            <button id="bookmark-btn" class="bookmark-btn text-2xl text-slate-400 hover:text-blue-500 transition-colors" title="Bookmark Question" aria-label="Bookmark Question"><i class="far fa-bookmark"></i></button>
                             <button id="flag-btn" class="flag-btn text-2xl text-slate-400 hover:text-amber-500 transition-colors" title="Flag for Review" aria-label="Flag for Review"><i class="far fa-flag"></i></button>
                             <button id="hint-btn" class="text-2xl text-slate-500 hover:text-yellow-500 transition-colors" title="Show Hint" aria-label="Show Hint"><i class="fas fa-lightbulb"></i></button>
                             <button id="quiz-note-btn" class="text-2xl text-slate-500 hover:text-amber-500 transition-colors note-icon" title="My Note"><i class="fas fa-sticky-note"></i></button>
@@ -583,14 +665,28 @@
                 </div>
             </div>
 
+            <!-- ADDED: Learning Mode Screen -->
             <div id="learning-mode-container" class="w-full hidden">
+                <!-- This part is for browsing questions, similar to QBank -->
                 <div id="learning-mode-controls">
                     <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
                         <button id="learning-mode-back-btn" class="text-slate-700 hover:text-blue-600 transition-colors" title="Back"><i class="fas fa-arrow-left"></i> Back</button>
                         <h2 class="text-xl md:text-2xl font-bold text-slate-800">Learning Mode</h2>
-                        <div class="w-16"></div> </div>
+                        <div class="w-16"></div> <!-- Spacer -->
+                    </div>
                     <div class="p-6 md:p-8">
-                        <h3 class="text-xl font-bold text-slate-800 mb-4 text-center">Browse Questions to Study</h3>
+                        <h3 class="text-xl font-bold text-slate-800 mb-4 text-center">Search for a Topic</h3>
+                        <div class="relative flex items-center mb-6">
+                            <input type="text" id="learning-search-input" placeholder="e.g., Flaps, Burns, Nerve..." class="w-full p-3 pl-10 border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                            <button id="learning-search-btn" class="absolute right-2 bg-blue-600 text-white rounded-lg px-4 py-1.5 hover:bg-blue-700">Search</button>
+                        </div>
+                        <p id="learning-search-error" class="text-red-500 text-xs italic text-center hidden"></p>
+                        <div class="relative flex py-2 items-center">
+                            <div class="flex-grow border-t border-gray-300"></div>
+                            <span class="flex-shrink mx-4 text-gray-400 text-sm">OR</span>
+                            <div class="flex-grow border-t border-gray-300"></div>
+                        </div>
+                         <h3 class="text-xl font-bold text-slate-800 mb-4 text-center">Browse Questions to Study</h3>
                          <p class="text-center text-slate-500 mb-6">Select a category to start learning. Questions will be displayed with their answers.</p>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <button id="learning-browse-by-chapter-btn" class="action-btn w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">Browse by Chapter</button>
@@ -598,11 +694,13 @@
                         </div>
                     </div>
                 </div>
+                <!-- This part is for displaying the question and answer -->
                 <div id="learning-mode-viewer" class="hidden">
                      <div class="p-4 md:p-6 bg-slate-100 border-b flex justify-between items-center">
                         <button id="end-learning-btn" class="text-slate-600 hover:text-red-600 transition-colors" title="End Session"><i class="fas fa-stop-circle text-2xl"></i></button>
                         <h2 id="learning-title" class="text-lg md:text-2xl font-bold text-slate-800 text-center mx-2 truncate"></h2>
-                        <div class="w-16"></div> </div>
+                        <div class="w-16"></div> <!-- Spacer -->
+                    </div>
                     <div class="p-6 md:p-8">
                          <div class="text-center mb-4">
                             <p id="learning-progress-text" class="font-semibold text-slate-600">Loading question...</p>
@@ -627,6 +725,7 @@
         </footer>
     </div>
 
+    <!-- Modals (Navigator, Confirmation, Image Viewer, Note) -->
     <div id="modal-backdrop" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
         <div id="confirmation-modal" class="bg-white rounded-lg p-8 shadow-xl max-w-sm w-full hidden">
             <h3 id="modal-title" class="text-xl font-bold mb-4">Are you sure?</h3>
@@ -643,6 +742,7 @@
                 <button id="navigator-close-btn" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Close</button>
             </div>
         </div>
+        <!-- ADDED: OSCE Navigator Modal -->
         <div id="osce-navigator-modal" class="bg-white rounded-lg p-6 shadow-xl max-w-lg w-full hidden">
             <h3 class="text-xl font-bold mb-4">Case & Question Navigator</h3>
             <div id="osce-navigator-content" class="space-y-2 max-h-80 overflow-y-auto"></div>
@@ -674,6 +774,7 @@
                 <button id="clear-log-cancel-btn" class="action-btn bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancel</button>
             </div>
         </div>
+        <!-- ADDED: Announcements Modal -->
         <div id="announcements-modal" class="bg-white rounded-lg p-6 shadow-xl max-w-lg w-full hidden">
             <h3 class="text-xl font-bold mb-4">Latest Updates & Announcements</h3>
             <div id="announcements-list" class="space-y-4 max-h-80 overflow-y-auto"></div>
@@ -681,7 +782,8 @@
                 <button id="announcements-close-btn" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Close</button>
             </div>
         </div>
-        </div>
+        <!-- REMOVED: Radio Modal from here -->
+    </div>
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -701,6 +803,7 @@
             // User Data
             currentUser: null,
             viewedLectures: new Set(),
+            bookmarkedQuestions: new Set(), // ADDED for bookmarking
             fullActivityLog: [],
             userQuizNotes: [],
             userLectureNotes: [],
@@ -745,6 +848,7 @@
             activityChartInstance: null,
             currentNote: { type: null, itemId: null, itemTitle: null },
             modalConfirmAction: null,
+            qbankSearchResults: [], // To store search results
         };
         
         const DEFAULT_TIME_PER_QUESTION = 45;
@@ -915,10 +1019,8 @@
         const osceNavigatorContent = document.getElementById('osce-navigator-content');
         const osceNavigatorCloseBtn = document.getElementById('osce-navigator-close-btn');
         const osceSelfCorrectionArea = document.getElementById('osce-self-correction-area');
-        // ADDED: Radio Banner Element
         const radioBannerContainer = document.getElementById('radio-banner-container');
         
-        // --- ADDED: Learning Mode Elements ---
         const learningModeBtn = document.getElementById('learning-mode-btn');
         const learningModeContainer = document.getElementById('learning-mode-container');
         const learningModeControls = document.getElementById('learning-mode-controls');
@@ -935,9 +1037,24 @@
         const learningAnswerButtons = document.getElementById('learning-answer-buttons');
         const learningPreviousBtn = document.getElementById('learning-previous-btn');
         const learningNextBtn = document.getElementById('learning-next-btn');
-
+        const learningSearchInput = document.getElementById('learning-search-input');
+        const learningSearchBtn = document.getElementById('learning-search-btn');
+        const learningSearchError = document.getElementById('learning-search-error');
+        const qbankSearchInput = document.getElementById('qbank-search-input');
+        const qbankSearchQCount = document.getElementById('qbank-search-q-count');
+        const qbankSearchBtn = document.getElementById('qbank-search-btn');
+        const qbankSearchError = document.getElementById('qbank-search-error');
+        const qbankSearchResultsContainer = document.getElementById('qbank-search-results-container');
+        const qbankSearchResultsInfo = document.getElementById('qbank-search-results-info');
+        const qbankStartSearchQuizBtn = document.getElementById('qbank-start-search-quiz-btn');
+        const selectAllSourcesMock = document.getElementById('select-all-sources-mock');
+        const selectAllChaptersMock = document.getElementById('select-all-chapters-mock');
+        const practiceBookmarkedBtn = document.getElementById('practice-bookmarked-btn'); // ADDED
+        const bookmarkBtn = document.getElementById('bookmark-btn'); // ADDED
 
         // --- FUNCTIONS ---
+        // All functions are defined here as standalone functions.
+        // They have access to appState and all the const elements defined above.
 
         function logUserActivity(eventData) {
             if (!API_URL || !appState.currentUser || appState.currentUser.Role === 'Guest') return;
@@ -1117,8 +1234,7 @@
             }
         }
 
-        // --- REFACTORED: Reusable function to populate filter options ---
-        function populateFilterOptions(containerElement, items, inputNamePrefix) {
+        function populateFilterOptions(containerElement, items, inputNamePrefix, counts) {
             containerElement.innerHTML = '';
             if (!items || items.length === 0) {
                 containerElement.innerHTML = `<p class="text-slate-400 text-sm">No options available.</p>`;
@@ -1129,21 +1245,54 @@
                 const div = document.createElement('div');
                 div.className = 'flex items-center';
                 const safeId = `${inputNamePrefix}-${item.replace(/[^a-zA-Z0-9]/g, '-')}`;
-                div.innerHTML = `<input id="${safeId}" name="${inputNamePrefix}" value="${item}" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"><label for="${safeId}" class="ml-3 text-sm text-gray-600">${item}</label>`;
+                const count = counts[item] || 0;
+                div.innerHTML = `<input id="${safeId}" name="${inputNamePrefix}" value="${item}" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"><label for="${safeId}" class="ml-3 text-sm text-gray-600">${item} (${count} Qs)</label>`;
                 containerElement.appendChild(div);
             });
         }
 
         function populateAllFilterOptions() {
-            const mcqChapters = [...new Set(appState.allQuestions.map(q => q.chapter))].sort();
-            const mcqSources = [...new Set(appState.allQuestions.map(q => q.source).filter(s => s))].sort();
-            populateFilterOptions(chapterSelectMock, mcqChapters, 'mock-chapter');
-            populateFilterOptions(sourceSelectMock, mcqSources, 'mock-source');
+            const sourceCounts = {};
+            const chapterCounts = {};
 
+            appState.allQuestions.forEach(q => {
+                const source = q.source || 'Uncategorized';
+                const chapter = q.chapter || 'Uncategorized';
+                sourceCounts[source] = (sourceCounts[source] || 0) + 1;
+                chapterCounts[chapter] = (chapterCounts[chapter] || 0) + 1;
+            });
+
+            const sortedSources = Object.keys(sourceCounts).sort();
+            const sortedChapters = Object.keys(chapterCounts).sort();
+            
+            populateFilterOptions(sourceSelectMock, sortedSources, 'mock-source', sourceCounts);
+            populateFilterOptions(chapterSelectMock, sortedChapters, 'mock-chapter', chapterCounts);
+            
             const osceChapters = [...new Set(appState.allOsceCases.map(c => c.Chapter).filter(c => c))].sort();
             const osceSources = [...new Set(appState.allOsceCases.map(c => c.Source).filter(s => s))].sort();
-            populateFilterOptions(chapterSelectOsce, osceChapters, 'osce-chapter');
-            populateFilterOptions(sourceSelectOsce, osceSources, 'osce-source');
+            // We don't have counts for OSCE yet, so we pass an empty object
+            populateFilterOptions(chapterSelectOsce, osceChapters, 'osce-chapter', {});
+            populateFilterOptions(sourceSelectOsce, osceSources, 'osce-source', {});
+        }
+        
+        function updateChapterFilter() {
+            const selectedSources = [...sourceSelectMock.querySelectorAll('input:checked')].map(el => el.value);
+            
+            let relevantQuestions;
+            if (selectedSources.length === 0) {
+                relevantQuestions = appState.allQuestions;
+            } else {
+                relevantQuestions = appState.allQuestions.filter(q => selectedSources.includes(q.source || 'Uncategorized'));
+            }
+
+            const chapterCounts = {};
+            relevantQuestions.forEach(q => {
+                const chapter = q.chapter || 'Uncategorized';
+                chapterCounts[chapter] = (chapterCounts[chapter] || 0) + 1;
+            });
+
+            const sortedChapters = Object.keys(chapterCounts).sort();
+            populateFilterOptions(chapterSelectMock, sortedChapters, 'mock-chapter', chapterCounts);
         }
 
         async function handleLogin(event) {
@@ -1375,17 +1524,27 @@
                 details.className = 'bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm';
                 details.open = !!filterText;
                 const summary = document.createElement('summary');
-                summary.className = 'p-4 flex justify-between items-center cursor-pointer hover:bg-slate-50 font-bold text-slate-800 text-lg';
+                summary.className = 'p-4 cursor-pointer hover:bg-slate-50';
                 
-                const lectureCount = chapterData.topics.length;
-                const mockCount = chapterData.mock ? 1 : 0;
-                
+                const totalTopics = chapterData.topics.length;
+                const viewedTopics = chapterData.topics.filter(topic => appState.viewedLectures.has(topic.link)).length;
+                const progressPercentage = totalTopics > 0 ? (viewedTopics / totalTopics) * 100 : 0;
+
                 summary.innerHTML = `
-                    <span class="flex items-center"><i class="${chapterData.icon || 'fas fa-layer-group'} mr-3 text-cyan-600 w-5 text-center"></i>${chapterName}</span>
-                    <div class="flex items-center gap-4">
-                        <span class="text-xs font-semibold text-slate-500 bg-slate-200 px-2 py-1 rounded-full">${lectureCount} Lectures</span>
-                        ${mockCount > 0 ? `<span class="text-xs font-semibold text-slate-500 bg-slate-200 px-2 py-1 rounded-full">${mockCount} Mock</span>` : ''}
-                        <i class="fas fa-chevron-down transition-transform duration-300 text-slate-500"></i>
+                    <div class="flex justify-between items-center">
+                        <span class="flex items-center font-bold text-slate-800 text-lg">
+                            <i class="${chapterData.icon || 'fas fa-layer-group'} mr-3 text-cyan-600 w-5 text-center"></i>
+                            ${chapterName}
+                        </span>
+                        <div class="flex items-center gap-4">
+                            <i class="fas fa-chevron-down transition-transform duration-300 text-slate-500"></i>
+                        </div>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2">
+                        <div class="w-full bg-slate-200 rounded-full h-2.5">
+                            <div class="bg-cyan-600 h-2.5 rounded-full" style="width: ${progressPercentage}%"></div>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-500">${viewedTopics}/${totalTopics}</span>
                     </div>
                 `;
                 
@@ -1495,6 +1654,7 @@
         function saveUserProgress() {
             if (!appState.currentUser || appState.currentUser.Role === 'Guest') return;
             localStorage.setItem(`viewedLectures_${appState.currentUser.UniqueID}`, JSON.stringify(Array.from(appState.viewedLectures)));
+            localStorage.setItem(`bookmarkedQuestions_${appState.currentUser.UniqueID}`, JSON.stringify(Array.from(appState.bookmarkedQuestions)));
         }
 
         function loadUserProgress() {
@@ -1502,6 +1662,10 @@
             const savedLectures = localStorage.getItem(`viewedLectures_${appState.currentUser.UniqueID}`);
             if (savedLectures) {
                 appState.viewedLectures = new Set(JSON.parse(savedLectures));
+            }
+            const savedBookmarks = localStorage.getItem(`bookmarkedQuestions_${appState.currentUser.UniqueID}`);
+            if (savedBookmarks) {
+                appState.bookmarkedQuestions = new Set(JSON.parse(savedBookmarks));
             }
         }
 
@@ -1713,7 +1877,6 @@
 
         function showSourceList(isLearningMode = false) {
             showScreen(listContainer);
-            const action = isLearningMode ? () => showChapterList(sourceGroup.displayName, true) : () => showChapterList(sourceGroup.displayName, false);
             
             if (appState.navigationHistory[appState.navigationHistory.length - 1] !== showSourceList) {
                appState.navigationHistory.push(() => showSourceList(isLearningMode));
@@ -1750,10 +1913,17 @@
             }
 
             listTitle.textContent = sourceFilter === 'All' 
-                ? (isLearningMode ? "Study All Chapters" : "All Chapters") 
-                : (isLearningMode ? `Study Chapters in ${sourceFilter}`: `Chapters in ${sourceFilter}`);
+                ? (isLearningMode ? "Select Chapters to Study" : "All Chapters") 
+                : (isLearningMode ? `Select Chapters from ${sourceFilter}`: `Chapters in ${sourceFilter}`);
             
             listItems.innerHTML = '';
+            
+            if (isLearningMode) {
+                listItems.className = 'p-4 md:p-6 space-y-3'; 
+            } else {
+                listItems.className = 'p-4 md:p-6 grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4';
+            }
+
             const questionsToDisplay = (sourceFilter === 'All') ? appState.allQuestions : appState.allQuestions.filter(q => q.source === sourceFilter);
             const chapters = {};
             questionsToDisplay.forEach(q => {
@@ -1761,16 +1931,78 @@
                 chapters[q.chapter].push(q);
             });
             const sortedChapterNames = Object.keys(chapters).sort();
-            for (const chapterName of sortedChapterNames) {
-                const button = document.createElement('button');
-                button.innerHTML = `<span>${chapterName}</span> <span class="text-xs font-normal opacity-75">(${chapters[chapterName].length} Qs)</span>`;
-                button.className = 'action-btn w-full p-4 rounded-lg bg-blue-600 text-white font-semibold text-lg hover:bg-blue-700 flex flex-col items-center justify-center text-center';
-                if (isLearningMode) {
-                    button.addEventListener('click', () => launchLearningMode(chapterName, chapters[chapterName]));
-                } else {
+
+            if (isLearningMode) {
+                // --- Learning Mode: Checkbox List ---
+                const selectAllContainer = document.createElement('div');
+                selectAllContainer.className = 'flex items-center p-2 border-b';
+                selectAllContainer.innerHTML = `
+                    <input id="select-all-chapters" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                    <label for="select-all-chapters" class="ml-3 font-bold text-gray-700">Select All</label>
+                `;
+                listItems.appendChild(selectAllContainer);
+
+                const chapterListContainer = document.createElement('div');
+                chapterListContainer.className = 'max-h-96 overflow-y-auto space-y-2 p-2';
+                listItems.appendChild(chapterListContainer);
+
+                sortedChapterNames.forEach(chapterName => {
+                    const chapterId = `learn-chapter-${chapterName.replace(/[^a-zA-Z0-9]/g, '-')}`;
+                    const div = document.createElement('div');
+                    div.className = 'flex items-center';
+                    div.innerHTML = `
+                        <input id="${chapterId}" name="learning-chapter" value="${chapterName}" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <label for="${chapterId}" class="ml-3 text-sm text-gray-600">${chapterName} (${chapters[chapterName].length} Qs)</label>
+                    `;
+                    chapterListContainer.appendChild(div);
+                });
+
+                const startButton = document.createElement('button');
+                startButton.id = 'start-learning-selection-btn';
+                startButton.className = 'action-btn w-full mt-4 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg';
+                startButton.textContent = 'Start Learning Session';
+                listItems.appendChild(startButton);
+                
+                const errorP = document.createElement('p');
+                errorP.id = 'learning-selection-error';
+                errorP.className = 'text-red-500 text-xs italic mt-2 text-center hidden';
+                listItems.appendChild(errorP);
+
+                document.getElementById('select-all-chapters').addEventListener('change', (e) => {
+                    listItems.querySelectorAll('input[name="learning-chapter"]').forEach(checkbox => {
+                        checkbox.checked = e.target.checked;
+                    });
+                });
+
+                startButton.addEventListener('click', () => {
+                    const selectedChapters = [...listItems.querySelectorAll('input[name="learning-chapter"]:checked')].map(el => el.value);
+                    
+                    if (selectedChapters.length === 0) {
+                        errorP.textContent = 'Please select at least one chapter to study.';
+                        errorP.classList.remove('hidden');
+                        return;
+                    }
+                    
+                    errorP.classList.add('hidden');
+
+                    let questionsToLearn = [];
+                    selectedChapters.forEach(chapterName => {
+                        questionsToLearn.push(...chapters[chapterName]);
+                    });
+
+                    const title = selectedChapters.length > 1 ? 'Multiple Chapters' : selectedChapters[0];
+                    launchLearningMode(title, questionsToLearn);
+                });
+
+            } else {
+                // --- Quiz Mode: Original Button Logic ---
+                sortedChapterNames.forEach(chapterName => {
+                    const button = document.createElement('button');
+                    button.innerHTML = `<span>${chapterName}</span> <span class="text-xs font-normal opacity-75">(${chapters[chapterName].length} Qs)</span>`;
+                    button.className = 'action-btn w-full p-4 rounded-lg bg-blue-600 text-white font-semibold text-lg hover:bg-blue-700 flex flex-col items-center justify-center text-center';
                     button.addEventListener('click', () => startChapterQuiz(chapterName, chapters[chapterName]));
-                }
-                listItems.appendChild(button);
+                    listItems.appendChild(button);
+                });
             }
         }
 
@@ -2408,6 +2640,18 @@
                 loadingText.classList.add('hidden');
             }
         }
+        
+        async function startBookmarkedQuestionsQuiz() {
+            const bookmarkedIds = Array.from(appState.bookmarkedQuestions);
+            if (bookmarkedIds.length === 0) {
+                showConfirmationModal('No Bookmarks', 'You have not bookmarked any questions yet.', () => modalBackdrop.classList.add('hidden'));
+                return;
+            }
+            
+            const bookmarkedQuestions = appState.allQuestions.filter(q => bookmarkedIds.includes(q.UniqueID));
+            const shuffled = [...bookmarkedQuestions].sort(() => Math.random() - 0.5);
+            launchQuiz(shuffled, "Bookmarked Questions");
+        }
 
         function logIncorrectAnswer(questionId, userAnswer) {
             const payload = {
@@ -2852,6 +3096,8 @@
         }
 
         function launchLearningMode(title, questions) {
+            showScreen(learningModeContainer); 
+
             appState.currentLearning.questions = questions;
             appState.currentLearning.currentIndex = 0;
             appState.currentLearning.title = title;
@@ -2923,7 +3169,80 @@
                 showLearningQuestion();
             }
         }
+        
+        function handleLearningSearch() {
+            const searchTerm = learningSearchInput.value.trim().toLowerCase();
+            if (searchTerm.length < 3) {
+                learningSearchError.textContent = 'Please enter at least 3 characters to search.';
+                learningSearchError.classList.remove('hidden');
+                return;
+            }
+            learningSearchError.classList.add('hidden');
 
+            const filteredQuestions = appState.allQuestions.filter(q => 
+                q.question.toLowerCase().includes(searchTerm) || 
+                q.answerOptions.some(opt => opt.text.toLowerCase().includes(searchTerm))
+            );
+
+            if (filteredQuestions.length === 0) {
+                learningSearchError.textContent = `No questions found for "${learningSearchInput.value}".`;
+                learningSearchError.classList.remove('hidden');
+            } else {
+                launchLearningMode(`Search Results for "${learningSearchInput.value}"`, filteredQuestions);
+            }
+        }
+        
+        function handleQBankSearch() {
+            const searchTerm = qbankSearchInput.value.trim().toLowerCase();
+            const errorEl = qbankSearchError;
+            errorEl.classList.add('hidden');
+            qbankSearchResultsContainer.classList.add('hidden');
+
+            if (searchTerm.length < 3) {
+                errorEl.textContent = 'Please enter at least 3 characters to search.';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            const filteredQuestions = appState.allQuestions.filter(q => 
+                q.question.toLowerCase().includes(searchTerm) || 
+                q.answerOptions.some(opt => opt.text.toLowerCase().includes(searchTerm))
+            );
+
+            appState.qbankSearchResults = filteredQuestions; // Store results
+
+            if (filteredQuestions.length === 0) {
+                errorEl.textContent = `No questions found for "${qbankSearchInput.value}".`;
+                errorEl.classList.remove('hidden');
+            } else {
+                const sources = [...new Set(filteredQuestions.map(q => q.source || 'N/A'))].join(', ');
+                qbankSearchResultsInfo.textContent = `Found ${filteredQuestions.length} questions for "${qbankSearchInput.value}". Sources: ${sources}`;
+                qbankSearchResultsContainer.classList.remove('hidden');
+            }
+        }
+
+        function startSearchedQuiz() {
+            const requestedCount = parseInt(qbankSearchQCount.value, 10);
+            const errorEl = qbankSearchError;
+            errorEl.classList.add('hidden');
+
+            const questionsToUse = appState.qbankSearchResults;
+
+            if (isNaN(requestedCount) || requestedCount <= 0) {
+                // If input is empty, use all questions
+                const shuffled = [...questionsToUse].sort(() => Math.random() - 0.5);
+                launchQuiz(shuffled, `Quiz for "${qbankSearchInput.value}"`);
+            } else {
+                if (requestedCount > questionsToUse.length) {
+                    errorEl.textContent = `Only ${questionsToUse.length} questions found. Please request a smaller number.`;
+                    errorEl.classList.remove('hidden');
+                } else {
+                    const shuffled = [...questionsToUse].sort(() => Math.random() - 0.5);
+                    const quizQuestions = shuffled.slice(0, requestedCount);
+                    launchQuiz(quizQuestions, `Quiz for "${qbankSearchInput.value}"`);
+                }
+            }
+        }
 
         // --- EVENT LISTENERS ---
         loginForm.addEventListener('submit', handleLogin);
@@ -2935,21 +3254,10 @@
         leaderboardBtn.addEventListener('click', showLeaderboardScreen);
         announcementsBtn.addEventListener('click', showAnnouncementsModal);
         osceBtn.addEventListener('click', showOsceScreen);
-        
-        // ADDED: Learning Mode Button Listener
         learningModeBtn.addEventListener('click', showLearningModeBrowseScreen);
         
-        lecturesBackBtn.addEventListener('click', handleBackNavigation);
-        qbankBackBtn.addEventListener('click', handleBackNavigation);
-        listBackBtn.addEventListener('click', handleBackNavigation);
-        activityBackBtn.addEventListener('click', handleBackNavigation);
-        libraryBackBtn.addEventListener('click', handleBackNavigation);
-        notesBackBtn.addEventListener('click', handleBackNavigation);
-        leaderboardBackBtn.addEventListener('click', handleBackNavigation);
-        osceBackBtn.addEventListener('click', handleBackNavigation);
-        
-        // ADDED: Learning Mode Back Button
-        learningModeBackBtn.addEventListener('click', handleBackNavigation);
+        const backButtons = [lecturesBackBtn, qbankBackBtn, listBackBtn, activityBackBtn, libraryBackBtn, notesBackBtn, leaderboardBackBtn, osceBackBtn, learningModeBackBtn];
+        backButtons.forEach(btn => btn.addEventListener('click', handleBackNavigation));
 
         globalHomeBtn.addEventListener('click', () => {
             if (appState.currentUser && appState.currentUser.Role === 'Guest') {
@@ -2976,6 +3284,7 @@
         browseBySourceBtn.addEventListener('click', () => showSourceList(false));
         toggleCustomOptionsBtn.addEventListener('click', () => customExamOptions.classList.toggle('visible'));
         practiceMistakesBtn.addEventListener('click', startIncorrectQuestionsQuiz);
+        practiceBookmarkedBtn.addEventListener('click', startBookmarkedQuestionsQuiz); // ADDED
 
         hintBtn.addEventListener('click', () => hintText.classList.remove('hidden'));
         flagBtn.addEventListener('click', toggleFlag);
@@ -2998,7 +3307,6 @@
             openNoteModal('quiz', currentQuestion.UniqueID, currentQuestion.question);
         });
 
-        // OSCE Listeners
         toggleOsceOptionsBtn.addEventListener('click', () => customOsceOptions.classList.toggle('visible'));
         startOsceSlayerBtn.addEventListener('click', startOsceSlayer);
         startCustomOsceBtn.addEventListener('click', startCustomOsce);
@@ -3008,12 +3316,14 @@
         osceNavigatorBtn.addEventListener('click', showOsceNavigator);
         osceNavigatorCloseBtn.addEventListener('click', () => modalBackdrop.classList.add('hidden'));
 
-        // ADDED: Learning Mode Listeners
         learningBrowseByChapterBtn.addEventListener('click', () => showChapterList('All', true));
         learningBrowseBySourceBtn.addEventListener('click', () => showSourceList(true));
         endLearningBtn.addEventListener('click', showLearningModeBrowseScreen);
         learningNextBtn.addEventListener('click', handleLearningNext);
         learningPreviousBtn.addEventListener('click', handleLearningPrevious);
+        learningSearchBtn.addEventListener('click', handleLearningSearch);
+        qbankSearchBtn.addEventListener('click', handleQBankSearch);
+        qbankStartSearchQuizBtn.addEventListener('click', startSearchedQuiz);
 
         modalCancelBtn.addEventListener('click', () => modalBackdrop.classList.add('hidden'));
         modalConfirmBtn.addEventListener('click', () => { if (appState.modalConfirmAction) appState.modalConfirmAction(); });
@@ -3032,7 +3342,7 @@
         
         clearLogBtn.addEventListener('click', () => {
             modalBackdrop.classList.remove('hidden');
-            clearLogModal.classList.add('hidden');
+            clearLogModal.classList.remove('hidden');
         });
         clearLogCancelBtn.addEventListener('click', () => {
             modalBackdrop.classList.add('hidden');
@@ -3042,7 +3352,6 @@
         clearLectureLogsBtn.addEventListener('click', () => handleClearLogs('lecture'));
         clearAllLogsBtn.addEventListener('click', () => handleClearLogs('all'));
         
-        // Radio Banner Listeners
         radioBtn.addEventListener('click', () => {
             radioBannerContainer.classList.toggle('open');
         });
@@ -3050,6 +3359,20 @@
             radioBannerContainer.classList.remove('open');
         });
         
+        sourceSelectMock.addEventListener('change', updateChapterFilter);
+        selectAllSourcesMock.addEventListener('change', (e) => {
+            sourceSelectMock.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = e.target.checked;
+            });
+            updateChapterFilter();
+        });
+
+        selectAllChaptersMock.addEventListener('change', (e) => {
+            chapterSelectMock.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = e.target.checked;
+            });
+        });
+
         // --- INITIAL LOAD ---
         loadContentData();
     });
