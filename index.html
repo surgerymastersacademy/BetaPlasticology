@@ -1471,36 +1471,48 @@
 
 
         function renderBooks() {
-            libraryList.innerHTML = '';
-            if (appState.mcqBooks.length === 0) {
-                libraryList.innerHTML = `<p class="text-center text-slate-500">No books found in the library.</p>`;
-                return;
-            }
+            libraryList.innerHTML = '';
+            if (appState.mcqBooks.length === 0) {
+                libraryList.innerHTML = `<p class="text-center text-slate-500">No books found in the library.</p>`;
+                return;
+            }
 
-            appState.mcqBooks.forEach(book => {
-                if (!book.Book || !book.Link) return;
-                const bookElement = document.createElement('a');
-                bookElement.href = book.Link;
-                bookElement.target = '_blank';
-                bookElement.className = 'flex items-start p-4 bg-white rounded-lg border border-slate-200 shadow-sm hover:shadow-md hover:bg-slate-50 transition-all duration-200';
+            appState.mcqBooks.forEach(book => {
+                if (!book.Book || !book.Link) return;
+                const bookElement = document.createElement('a');
+                bookElement.href = book.Link;
+                bookElement.target = '_blank';
+                bookElement.className = 'flex items-start p-4 bg-white rounded-lg border border-slate-200 shadow-sm hover:shadow-md hover:bg-slate-50 transition-all duration-200';
 
-                const iconHtml = `<div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-orange-100 rounded-lg mr-4">
-                                        <i class="${book.icon || 'fas fa-book'} text-2xl text-orange-600"></i>
-                                    </div>`;
-                
-                const contentHtml = `<div class="flex-grow">
-                                         <h3 class="font-bold text-slate-800 text-lg">${book.Book}</h3>
-                                         <p class="text-slate-600 text-sm mt-1">${book.Description || ''}</p>
-                                     </div>`;
+                // --- START: MODIFIED CODE ---
+                let iconHtml;
+                // Check if the icon field contains a valid URL
+                if (book.icon && (book.icon.startsWith('http://') || book.icon.startsWith('https://'))) {
+                    // If it's a URL, use an <img> tag
+                    iconHtml = `<div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-slate-100 rounded-lg mr-4 overflow-hidden">
+                                    <img src="${book.icon}" alt="${book.Book}" class="w-full h-full object-cover">
+                                </div>`;
+                } else {
+                    // Otherwise, use a Font Awesome icon (either from the sheet or a default one)
+                    iconHtml = `<div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-orange-100 rounded-lg mr-4">
+                                    <i class="${book.icon || 'fas fa-book'} text-2xl text-orange-600"></i>
+                                </div>`;
+                }
+                // --- END: MODIFIED CODE ---
 
-                const arrowHtml = `<div class="flex-shrink-0 ml-4 self-center">
-                                       <i class="fas fa-external-link-alt text-slate-400"></i>
-                                   </div>`;
+                const contentHtml = `<div class="flex-grow">
+                                         <h3 class="font-bold text-slate-800 text-lg">${book.Book}</h3>
+                                         <p class="text-slate-600 text-sm mt-1">${book.Description || ''}</p>
+                                     </div>`;
 
-                bookElement.innerHTML = iconHtml + contentHtml + arrowHtml;
-                libraryList.appendChild(bookElement);
-            });
-        }
+                const arrowHtml = `<div class="flex-shrink-0 ml-4 self-center">
+                                       <i class="fas fa-external-link-alt text-slate-400"></i>
+                                   </div>`;
+
+                bookElement.innerHTML = iconHtml + contentHtml + arrowHtml;
+                libraryList.appendChild(bookElement);
+            });
+        }
         
         function renderLectures(filterText = '') {
             lecturesList.innerHTML = '';
