@@ -1,7 +1,12 @@
-// js/dom.js (FINAL VERSION - INCLUDES SIMULATION FILTERS)
-// هذا الملف يحتوي على مراجع لجميع عناصر HTML لمنع أخطاء "Undefined"
+// js/dom.js (FINAL VERSION - Updated for Dashboard Layout)
 
-// --- الرأس والقائمة العلوية (Header & Nav) ---
+// --- Layout Containers (NEW) ---
+export const loginWrapper = document.getElementById('login-wrapper');
+export const appLayout = document.getElementById('app-layout');
+export const sidebar = document.getElementById('sidebar');
+export const bottomNav = document.getElementById('bottom-nav');
+
+// --- Header & Nav ---
 export const globalHeader = document.getElementById('global-header');
 export const globalHomeBtn = document.getElementById('global-home-btn');
 export const logoutBtn = document.getElementById('logout-btn');
@@ -16,11 +21,11 @@ export const radioBtn = document.getElementById('radio-btn');
 export const radioCloseBtn = document.getElementById('radio-close-btn');
 export const radioBannerContainer = document.getElementById('radio-banner-container');
 
-// --- عناصر Daily Streak ---
+// --- Daily Streak ---
 export const streakContainer = document.getElementById('streak-container');
 export const streakCount = document.getElementById('streak-count');
 
-// --- عناصر المساعدة والجولة (Onboarding) ---
+// --- Onboarding ---
 export const helpBtn = document.getElementById('help-btn');
 export const onboardingModal = document.getElementById('onboarding-modal');
 export const startTourBtn = document.getElementById('start-tour-btn');
@@ -32,9 +37,9 @@ export const tourNextBtn = document.getElementById('tour-next-btn');
 export const tourEndBtn = document.getElementById('tour-end-btn');
 export const tourStepCount = document.getElementById('tour-step-count');
 
-// --- الحاويات الرئيسية (Screens / Containers) ---
-export const loginContainer = document.getElementById('login-container');
-export const mainMenuContainer = document.getElementById('main-menu-container');
+// --- Main Screens / Containers ---
+export const loginContainer = document.getElementById('login-container'); // Inside wrapper
+export const mainMenuContainer = document.getElementById('main-menu-container'); // Dashboard
 export const lecturesContainer = document.getElementById('lectures-container');
 export const qbankContainer = document.getElementById('qbank-container');
 export const listContainer = document.getElementById('list-container');
@@ -50,7 +55,7 @@ export const theoryContainer = document.getElementById('theory-container');
 export const studyPlannerContainer = document.getElementById('study-planner-container');
 export const matchingContainer = document.getElementById('matching-container');
 
-// --- شاشة تسجيل الدخول (Login) ---
+// --- Login Form Elements ---
 export const loginForm = document.getElementById('login-form');
 export const loginLoader = document.getElementById('login-loader');
 export const loginLoadingText = document.getElementById('login-loading-text');
@@ -63,7 +68,7 @@ export const freeTestBtn = document.getElementById('free-test-btn');
 export const pwaInstallBanner = document.getElementById('pwa-install-banner');
 export const pwaInstallBtn = document.getElementById('pwa-install-btn');
 
-// --- أزرار القائمة الرئيسية (Main Menu Buttons) ---
+// --- Sidebar Buttons (Mapped to old IDs for compatibility) ---
 export const lecturesBtn = document.getElementById('lectures-btn');
 export const qbankBtn = document.getElementById('qbank-btn');
 export const libraryBtn = document.getElementById('library-btn');
@@ -74,11 +79,11 @@ export const osceBtn = document.getElementById('osce-btn');
 export const studyPlannerBtn = document.getElementById('study-planner-btn');
 export const matchingBtn = document.getElementById('matching-btn');
 
-// --- شرائط النشاط الأخير ---
+// --- Ribbons ---
 export const lastLectureRibbon = document.getElementById('last-lecture-ribbon');
 export const lastQuizRibbon = document.getElementById('last-quiz-ribbon');
 
-// --- أزرار الرجوع (Back Buttons) ---
+// --- Back Buttons ---
 export const lecturesBackBtn = document.getElementById('lectures-back-btn');
 export const qbankBackBtn = document.getElementById('qbank-back-btn');
 export const libraryBackBtn = document.getElementById('library-back-btn');
@@ -92,19 +97,19 @@ export const theoryBackBtn = document.getElementById('theory-back-btn');
 export const studyPlannerBackBtn = document.getElementById('study-planner-back-btn');
 export const matchingBackBtn = document.getElementById('matching-back-btn');
 
-// --- المكتبة والترتيب ---
+// --- Library & Leaderboard ---
 export const libraryLoader = document.getElementById('library-loader');
 export const libraryList = document.getElementById('library-list');
 export const leaderboardLoader = document.getElementById('leaderboard-loader');
 export const leaderboardList = document.getElementById('leaderboard-list');
 export const currentUserRankDiv = document.getElementById('current-user-rank');
 
-// --- المحاضرات (Lectures) ---
+// --- Lectures ---
 export const lectureSearchInput = document.getElementById('lecture-search-input');
 export const lecturesLoader = document.getElementById('lectures-loader');
 export const lecturesList = document.getElementById('lectures-list');
 
-// --- الملاحظات وسجل النشاط ---
+// --- Notes & Activity ---
 export const notesFilterQuizzes = document.getElementById('notes-filter-quizzes');
 export const notesFilterLectures = document.getElementById('notes-filter-lectures');
 export const notesFilterTheory = document.getElementById('notes-filter-theory');
@@ -126,7 +131,7 @@ export const logFilterQuizzes = document.getElementById('log-filter-quizzes');
 export const logFilterLectures = document.getElementById('log-filter-lectures');
 export const activityChartCanvas = document.getElementById('activity-chart');
 
-// --- بنك الأسئلة (QBank) ---
+// --- QBank ---
 export const loader = document.getElementById('loader');
 export const loadingText = document.getElementById('loading-text');
 export const mockQCountInput = document.getElementById('mock-q-count');
@@ -153,6 +158,8 @@ export const selectAllChaptersMock = document.getElementById('select-all-chapter
 export const practiceBookmarkedBtn = document.getElementById('practice-bookmarked-btn');
 export const startSimulationBtn = document.getElementById('start-simulation-btn');
 export const simulationError = document.getElementById('simulation-error');
+
+// QBank Tabs & Panels
 export const qbankTabCreate = document.getElementById('qbank-tab-create');
 export const qbankTabPractice = document.getElementById('qbank-tab-practice');
 export const qbankTabBrowse = document.getElementById('qbank-tab-browse');
@@ -161,7 +168,7 @@ export const qbankPanelPractice = document.getElementById('qbank-panel-practice'
 export const qbankPanelBrowse = document.getElementById('qbank-panel-browse');
 export const qbankMainContent = document.getElementById('qbank-main-content');
 
-// --- NEW SIMULATION FILTER ELEMENTS (Added Here) ---
+// SIMULATION FILTERS
 export const toggleSimulationOptionsBtn = document.getElementById('toggle-simulation-options-btn');
 export const simulationCustomOptions = document.getElementById('simulation-custom-options');
 export const sourceSelectSim = document.getElementById('source-select-sim');
@@ -169,8 +176,7 @@ export const chapterSelectSim = document.getElementById('chapter-select-sim');
 export const selectAllSourcesSim = document.getElementById('select-all-sources-sim');
 export const selectAllChaptersSim = document.getElementById('select-all-chapters-sim');
 
-
-// --- واجهة الاختبار (Quiz UI) ---
+// --- Quiz UI ---
 export const listTitle = document.getElementById('list-title');
 export const listItems = document.getElementById('list-items');
 export const quizTitle = document.getElementById('quiz-title');
@@ -204,7 +210,7 @@ export const restartBtn = document.getElementById('restart-btn');
 export const resultsHomeBtn = document.getElementById('results-home-btn');
 export const reviewIncorrectBtn = document.getElementById('review-incorrect-btn');
 
-// --- Planner (Study Planner Elements) ---
+// --- Planner ---
 export const studyPlannerLoader = document.getElementById('study-planner-loader');
 export const plannerDashboard = document.getElementById('planner-dashboard');
 export const activePlanView = document.getElementById('active-plan-view');
@@ -227,7 +233,7 @@ export const createPlanError = document.getElementById('create-plan-error');
 export const cancelCreatePlanBtn = document.getElementById('cancel-create-plan-btn');
 export const confirmCreatePlanBtn = document.getElementById('confirm-create-plan-btn');
 
-// --- Matching Bank UI ---
+// --- Matching ---
 export const matchingMenuContainer = document.getElementById('matching-menu-container');
 export const matchingGameContainer = document.getElementById('matching-game-container');
 export const matchingSetCountInput = document.getElementById('matching-set-count');
@@ -245,7 +251,7 @@ export const matchingAnswersArea = document.getElementById('matching-answers-are
 export const matchingSubmitBtn = document.getElementById('matching-submit-btn');
 export const matchingNextBtn = document.getElementById('matching-next-btn');
 
-// --- النوافذ المنبثقة (Modals) ---
+// --- Modals ---
 export const modalBackdrop = document.getElementById('modal-backdrop');
 export const confirmationModal = document.getElementById('confirmation-modal');
 export const modalConfirmBtn = document.getElementById('modal-confirm-btn');
@@ -295,7 +301,7 @@ export const saveProfileBtn = document.getElementById('save-profile-btn');
 export const cardSubscriptionStatus = document.getElementById('card-subscription-status');
 export const cardSubscriptionExpiry = document.getElementById('card-subscription-expiry');
 
-// --- تسجيل الحساب (Registration) ---
+// --- Registration ---
 export const registrationModal = document.getElementById('registration-modal');
 export const registrationForm = document.getElementById('registration-form');
 export const registerCancelBtn = document.getElementById('register-cancel-btn');
@@ -312,7 +318,7 @@ export const registerCountry = document.getElementById('register-country');
 export const registerStudyType = document.getElementById('register-study-type');
 export const registerExamDate = document.getElementById('register-exam-date');
 
-// --- OSCE & Theory UI ---
+// --- OSCE & Theory ---
 export const startOsceSlayerBtn = document.getElementById('start-osce-slayer-btn');
 export const osceCaseCountInput = document.getElementById('osce-case-count');
 export const osceTimePerQInput = document.getElementById('osce-time-per-q');
@@ -341,6 +347,7 @@ export const osceNavigatorModal = document.getElementById('osce-navigator-modal'
 export const osceNavigatorContent = document.getElementById('osce-navigator-content');
 export const osceNavigatorCloseBtn = document.getElementById('osce-navigator-close-btn');
 export const osceSelfCorrectionArea = document.getElementById('osce-self-correction-area');
+
 export const learningModeControls = document.getElementById('learning-mode-controls');
 export const learningModeViewer = document.getElementById('learning-mode-viewer');
 export const learningBrowseByChapterBtn = document.getElementById('learning-browse-by-chapter-btn');
@@ -357,6 +364,7 @@ export const learningNextBtn = document.getElementById('learning-next-btn');
 export const learningSearchInput = document.getElementById('learning-search-input');
 export const learningSearchBtn = document.getElementById('learning-search-btn');
 export const learningSearchError = document.getElementById('learning-search-error');
+
 export const theoryControls = document.getElementById('theory-controls');
 export const theoryViewer = document.getElementById('theory-viewer');
 export const theorySearchInput = document.getElementById('theory-search-input');
