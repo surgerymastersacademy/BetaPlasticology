@@ -1,0 +1,335 @@
+// js/features/userProfile.js (FINAL - CORS FIXED)
+
+import { API_URL, appState, AVATAR_BASE_URL, AVATAR_OPTIONS } from '../state.js';
+import * as dom from '../dom.js';
+import * as ui from '../ui.js';
+import { fetchUserData } from '../api.js';
+import { calculateDaysLeft } from '../utils.js';
+import { showMainMenuScreen } from '../main.js';
+import { saveUserProgress } from './lectures.js';
+
+// --- Helper for Safe Requests ---
+async function sendProfileRequest(payload) {
+    const response = await fetch(API_URL, {
+        method: 'POST',
+        redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // CORS Safe
+        body: JSON.stringify(payload)
+    });
+    return await response.json();
+}
+
+export async function handleLogin(event) {
+    event.preventDefault();
+    dom.loginError.classList.add('hidden');
+    dom.loginSubmitBtn.disabled = true;
+    dom.loginSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Logging in...';
+
+    const payload = {
+        eventType: 'login',
+        username: dom.usernameInput.value,
+        password: dom.passwordInput.value
+    };
+
+    try {
+        // استخدام الدالة الآمنة
+        const result = await sendProfileRequest(payload);
+
+        if (result.success) {
+            appState.currentUser = result.user;
+            const userRoleData = appState.allRoles.find(role => role.Role === appState.currentUser.Role);
+            appState.userRoles = userRoleData || {};
+
+            ui.updateWatermark();
+            await fetchUserData();
+            loadUserProgress(); 
+            
+            // Sync Lecture Views from Log
+            if (appState.fullActivityLog.length > 0) {
+                const lectureLogs = appState.fullActivityLog.filter(log => log.eventType === 'ViewLecture');
+                const lectureLinksMap = new Map();
+                Object.values(appState.groupedLectures).forEach(chapter => {
+                    chapter.topics.forEach(topic => {
+                        lectureLinksMap.set(topic.name, topic.link);
+                    });
+                });
+                lectureLogs.forEach(log => {
+                    if (lectureLinksMap.has(log.title)) {
+                        appState.viewedLectures.add(lectureLinksMap.get(log.title));
+                    }
+                });
+                saveUserProgress();
+            }
+
+            await showUserCardModal(true);
+            updateUserProfileHeader();
+            showMainMenuScreen();
+        } else {
+            dom.loginError.textContent = result.message || "Invalid username or password.";
+            dom.loginError.classList.remove('hidden');
+        }
+    } catch (error) {
+        console.error("Login API Error:", error);
+        dom.loginError.textContent = "Connection error. Please try again.";
+        dom.loginError.classList.remove('hidden');
+    } finally {
+        dom.loginSubmitBtn.disabled = false;
+        dom.loginSubmitBtn.textContent = 'Log In';
+    }
+}
+
+export function handleLogout() {
+    ui.showConfirmationModal('Log Out?', 'Are you sure you want to log out?', () => {
+        appState.currentUser = null;
+        appState.navigationHistory = [];
+        dom.usernameInput.value = '';
+        dom.passwordInput.value = '';
+        ui.showScreen(dom.loginContainer);
+        dom.modalBackdrop.classList.add('hidden');
+    });
+}
+
+export function checkPermission(feature) {
+    if (!appState.currentUser || appState.currentUser.Role === 'Guest') {
+        ui.showConfirmationModal('Access Denied', 'Please log in to access this feature.', () => dom.modalBackdrop.classList.add('hidden'));
+        return false;
+    }
+    const userRolePermissions = appState.allRoles.find(role => role.Role === appState.currentUser.Role);
+    if (!userRolePermissions || String(userRolePermissions[feature]).toLowerCase() !== 'true') {
+        ui.showConfirmationModal('Access Denied', `Your current role does not have access to the "${feature}" feature.`, () => dom.modalBackdrop.classList.add('hidden'));
+        return false;
+    }
+    return true;
+}
+
+export function applyRolePermissions() {
+    const rolePermissions = appState.allRoles.find(role => role.Role === appState.currentUser.Role);
+    if (!rolePermissions) return;
+
+    const featureElements = {
+        'Lectures': dom.lecturesBtn,
+        'MCQBank': dom.qbankBtn,
+        'LerningMode': dom.learningModeBtn,
+        'OSCEBank': dom.osceBtn,
+        'LeadersBoard': dom.leaderboardBtn,
+        'Radio': dom.radioBtn,
+        'Library': dom.libraryBtn,
+        'StudyPlanner': dom.studyPlannerBtn,
+        'TheoryBank': dom.theoryBtn,
+    };
+
+    for (const feature in featureElements) {
+        const element = featureElements[feature];
+        if (element) {
+            const hasAccess = String(rolePermissions[feature]).toLowerCase() === 'true';
+            element.disabled = !hasAccess;
+            element.style.opacity = hasAccess ? '1' : '0.5';
+            element.style.cursor = hasAccess ? 'pointer' : 'not-allowed';
+        }
+    }
+}
+
+// --- USER CARD & PROFILE ---
+
+export async function showUserCardModal(isLoginFlow = false) {
+    if (!appState.currentUser || appState.currentUser.Role === 'Guest') {
+        if(!isLoginFlow) ui.showConfirmationModal('Access Denied', 'Please log in.', () => dom.modalBackdrop.classList.add('hidden'));
+        return;
+    }
+    if (!isLoginFlow) dom.modalBackdrop.classList.remove('hidden');
+    dom.userCardModal.classList.remove('hidden');
+    dom.profileEditView.classList.add('hidden');
+    dom.profileDetailsView.classList.remove('hidden');
+    dom.profileEditError.classList.add('hidden');
+
+    try {
+        const response = await fetch(`${API_URL}?request=getUserCardData&userId=${appState.currentUser.UniqueID}&t=${new Date().getTime()}`, { redirect: 'follow' });
+        if (!response.ok) throw new Error('Failed to fetch user card data.');
+        const data = await response.json();
+        if (data.error) throw new Error(data.error);
+
+        appState.userCardData = data.cardData;
+        renderUserCard();
+        populateAvatarSelection();
+    } catch (error) {
+        console.error("Error loading user card data:", error);
+    }
+}
+
+function renderUserCard() {
+    if (!appState.currentUser || !appState.userCardData) return;
+    
+    const cardData = appState.userCardData;
+    const displayName = cardData.Nickname && cardData.Nickname.trim() !== '' ? cardData.Nickname : appState.currentUser.Name;
+    dom.cardUserName.textContent = displayName;
+    dom.cardUserNickname.textContent = cardData.Nickname && cardData.Nickname.trim() !== '' ? `(${appState.currentUser.Name})` : '';
+    dom.cardQuizScore.textContent = cardData.QuizScore !== undefined ? cardData.QuizScore : '0';
+    dom.userAvatar.src = cardData.User_Img || (AVATAR_BASE_URL + appState.currentUser.Name);
+    dom.headerUserAvatar.src = dom.userAvatar.src;
+    
+    if (cardData.ExamDate) {
+        const examDate = new Date(cardData.ExamDate);
+        if (!isNaN(examDate)) {
+            dom.cardExamDate.textContent = examDate.toLocaleDateString('en-GB');
+            const daysLeft = calculateDaysLeft(examDate);
+            dom.cardDaysLeft.textContent = daysLeft >= 0 ? `${daysLeft} days left` : 'Exam passed';
+        } else {
+            dom.cardExamDate.textContent = 'Invalid Date';
+            dom.cardDaysLeft.textContent = 'N/A';
+        }
+    } else {
+        dom.cardExamDate.textContent = 'Not Set';
+        dom.cardDaysLeft.textContent = 'N/A';
+    }
+
+    const userData = appState.currentUser;
+    dom.cardSubscriptionStatus.textContent = userData.Role || 'N/A';
+    dom.cardSubscriptionStatus.className = userData.Role === 'Trial' ? 'text-orange-500 font-bold' : 'text-green-500 font-bold';
+
+    if (userData.SubscriptionEndDate) {
+        const expiryDate = new Date(userData.SubscriptionEndDate);
+        dom.cardSubscriptionExpiry.textContent = !isNaN(expiryDate) ? expiryDate.toLocaleDateString('en-GB') : 'N/A';
+    } else {
+        dom.cardSubscriptionExpiry.textContent = 'N/A';
+    }
+}
+
+export function toggleProfileEditMode(isEditing) {
+    if (isEditing) {
+        dom.profileDetailsView.classList.add('hidden');
+        dom.profileEditView.classList.remove('hidden');
+        dom.editNickname.value = appState.userCardData.Nickname || '';
+        dom.editExamDate.value = appState.userCardData.ExamDate ? new Date(appState.userCardData.ExamDate).toISOString().split('T')[0] : '';
+        dom.avatarSelectionGrid.querySelectorAll('img').forEach(img => {
+            img.classList.remove('border-blue-500', 'border-2');
+            if (img.src === dom.userAvatar.src) img.classList.add('border-blue-500', 'border-2');
+        });
+    } else {
+        dom.profileDetailsView.classList.remove('hidden');
+        dom.profileEditView.classList.add('hidden');
+    }
+}
+
+function populateAvatarSelection() {
+    dom.avatarSelectionGrid.innerHTML = '';
+    AVATAR_OPTIONS.forEach(seed => {
+        const img = document.createElement('img');
+        img.src = AVATAR_BASE_URL + seed;
+        img.className = 'w-12 h-12 rounded-full cursor-pointer hover:opacity-80 transition-opacity';
+        img.addEventListener('click', () => {
+            dom.avatarSelectionGrid.querySelectorAll('img').forEach(i => i.classList.remove('border-blue-500', 'border-2'));
+            img.classList.add('border-blue-500', 'border-2');
+            dom.userAvatar.src = img.src;
+        });
+        dom.avatarSelectionGrid.appendChild(img);
+    });
+}
+
+export async function handleSaveProfile() {
+    dom.profileEditError.classList.add('hidden');
+    const payload = {
+        eventType: 'updateUserCardData',
+        userId: appState.currentUser.UniqueID,
+        nickname: dom.editNickname.value.trim(),
+        examDate: dom.editExamDate.value,
+        userImg: dom.userAvatar.src
+    };
+
+    try {
+        await sendProfileRequest(payload);
+        appState.userCardData.Nickname = payload.nickname;
+        appState.userCardData.ExamDate = payload.examDate;
+        appState.userCardData.User_Img = payload.userImg;
+        renderUserCard();
+        updateUserProfileHeader();
+        toggleProfileEditMode(false);
+        ui.showConfirmationModal('Success', 'Profile updated!', () => dom.modalBackdrop.classList.add('hidden'));
+    } catch (error) {
+        dom.profileEditError.textContent = `Failed to save profile.`;
+        dom.profileEditError.classList.remove('hidden');
+    }
+}
+
+export function updateUserProfileHeader() {
+    if (appState.currentUser) {
+        const displayName = (appState.userCardData && appState.userCardData.Nickname) ? appState.userCardData.Nickname : appState.currentUser.Name;
+        dom.userNameDisplay.textContent = displayName;
+        dom.headerUserAvatar.src = (appState.userCardData && appState.userCardData.User_Img) ? appState.userCardData.User_Img : (AVATAR_BASE_URL + appState.currentUser.Name);
+    }
+}
+
+// --- MESSENGER ---
+
+export async function showMessengerModal() {
+    if (!appState.currentUser || appState.currentUser.Role === 'Guest') return;
+    dom.modalBackdrop.classList.remove('hidden');
+    dom.messengerModal.classList.remove('hidden');
+    dom.messagesList.innerHTML = '<p class="text-center text-slate-500">Loading...</p>';
+    dom.messengerError.classList.add('hidden');
+    await fetchAndRenderMessages();
+    if (appState.messengerPollInterval) clearInterval(appState.messengerPollInterval);
+    appState.messengerPollInterval = setInterval(fetchAndRenderMessages, 10000);
+}
+
+async function fetchAndRenderMessages() {
+    try {
+        const response = await fetch(`${API_URL}?request=getMessages&userId=${appState.currentUser.UniqueID}&t=${new Date().getTime()}`, { redirect: 'follow' });
+        const data = await response.json();
+        if (JSON.stringify(appState.userMessages) !== JSON.stringify(data.messages)) {
+            appState.userMessages = data.messages || [];
+            renderMessages();
+        }
+    } catch (error) { console.error("Messenger Error:", error); }
+}
+
+function renderMessages() {
+    dom.messagesList.innerHTML = '';
+    if (appState.userMessages.length === 0) {
+        dom.messagesList.innerHTML = `<p class="text-center text-slate-500">No messages yet.</p>`;
+        return;
+    }
+    appState.userMessages.forEach(msg => {
+        const messageDiv = document.createElement('div');
+        const timestamp = new Date(msg.Timestamp).toLocaleString('en-GB');
+        if (msg.UserMessage) {
+            messageDiv.innerHTML += `<div class="flex justify-end mb-2"><div class="bg-blue-500 text-white p-3 rounded-lg max-w-[80%]"><p class="text-sm">${msg.UserMessage}</p><p class="text-xs text-right opacity-80 mt-1">${timestamp}</p></div></div>`;
+        }
+        if (msg.AdminReply) {
+            messageDiv.innerHTML += `<div class="flex justify-start mb-2"><div class="bg-gray-200 text-slate-800 p-3 rounded-lg max-w-[80%]"><p class="text-sm">${msg.AdminReply}</p><p class="text-xs text-left opacity-80 mt-1">${timestamp} (Admin)</p></div></div>`;
+        }
+        dom.messagesList.appendChild(messageDiv);
+    });
+    dom.messagesList.scrollTop = dom.messagesList.scrollHeight;
+}
+
+export async function handleSendMessageBtn() {
+    const messageText = dom.messageInput.value.trim();
+    if (!messageText) return;
+
+    dom.sendMessageBtn.disabled = true;
+    const payload = {
+        eventType: 'sendMessage',
+        userId: appState.currentUser.UniqueID,
+        userName: appState.currentUser.Name,
+        message: messageText
+    };
+
+    try {
+        await sendProfileRequest(payload);
+        await fetchAndRenderMessages();
+        dom.messageInput.value = '';
+    } catch (error) {
+        dom.messengerError.textContent = "Failed to send.";
+        dom.messengerError.classList.remove('hidden');
+    } finally {
+        dom.sendMessageBtn.disabled = false;
+    }
+}
+
+export function loadUserProgress() {
+    if (!appState.currentUser || appState.currentUser.Role === 'Guest') return;
+    const savedLectures = localStorage.getItem(`viewedLectures_${appState.currentUser.UniqueID}`);
+    if (savedLectures) appState.viewedLectures = new Set(JSON.parse(savedLectures));
+    const savedBookmarks = localStorage.getItem(`bookmarkedQuestions_${appState.currentUser.UniqueID}`);
+    if (savedBookmarks) appState.bookmarkedQuestions = new Set(JSON.parse(savedBookmarks));
+}
