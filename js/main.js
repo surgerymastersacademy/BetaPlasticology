@@ -1,4 +1,4 @@
-// js/main.js (FINAL VERSION - Connected to Dashboard)
+// js/main.js (FINAL FULL VERSION - FIXED SETTINGS & PLANNER)
 
 import { appState } from './state.js';
 import * as dom from './dom.js';
@@ -64,9 +64,9 @@ export function openNoteModal(type, itemId, itemTitle) {
     if(dom.noteModal) dom.noteModal.classList.remove('hidden');
 }
 
-// --- Filter Population (Crucial for new Simulation UI) ---
+// --- Filter Population ---
 function populateAllFilters() {
-    // 1. QBank Mock Filters (Mock Exam Card)
+    // 1. QBank Mock Filters
     const allSources = [...new Set(appState.allQuestions.map(q => q.source || 'Uncategorized'))].sort();
     const sourceCounts = appState.allQuestions.reduce((acc, q) => {
         const source = q.source || 'Uncategorized';
@@ -74,13 +74,10 @@ function populateAllFilters() {
         return acc;
     }, {});
     ui.populateFilterOptions(dom.sourceSelectMock, allSources, 'mock-source', sourceCounts);
-    updateChapterFilter(); // Updates chapters based on selected sources
+    updateChapterFilter();
 
-    // 2. Simulation Filters (NEW Dashboard Card)
-    // Populate Sources for Simulation
+    // 2. Simulation Filters
     ui.populateFilterOptions(dom.sourceSelectSim, allSources, 'sim-source', sourceCounts);
-    
-    // Populate Chapters for Simulation (All initially)
     const allChapters = [...new Set(appState.allQuestions.map(q => q.chapter || 'Uncategorized'))].sort();
     const chapterCounts = appState.allQuestions.reduce((acc, q) => {
         const chapter = q.chapter || 'Uncategorized';
@@ -89,7 +86,6 @@ function populateAllFilters() {
     }, {});
     ui.populateFilterOptions(dom.chapterSelectSim, allChapters, 'sim-chapter', chapterCounts);
 
-    // Select All by default for Simulation
     if(dom.sourceSelectSim) dom.sourceSelectSim.querySelectorAll('input').forEach(i => i.checked = true);
     if(dom.chapterSelectSim) dom.chapterSelectSim.querySelectorAll('input').forEach(i => i.checked = true);
 
@@ -113,7 +109,7 @@ function populateAllFilters() {
 // --- Routing Logic ---
 function handleRouting() {
     if (!appState.currentUser && window.location.hash !== '#login') {
-        return; // Block access if not logged in
+        return;
     }
     const hash = window.location.hash;
     switch(hash) {
@@ -124,7 +120,10 @@ function handleRouting() {
         case '#theory': if (checkPermission('TheoryBank')) showTheoryMenuScreen(); break;
         case '#osce': if (checkPermission('OSCEBank')) ui.showScreen(dom.osceContainer); break;
         case '#library': if (checkPermission('Library')) { ui.renderBooks(); ui.showScreen(dom.libraryContainer); } break;
-        case '#planner': if (checkPermission('StudyPlanner')) showStudyPlannerScreen(); break;
+        case '#planner': if (checkPermission('StudyPlanner')) {
+             // Safe Guard for Planner
+             try { showStudyPlannerScreen(); } catch(e) { console.error(e); alert("Planner data error. Clear cache."); }
+        } break;
         case '#leaderboard': if (checkPermission('LeadersBoard')) showLeaderboardScreen(); break;
         case '#activity': showActivityLog(); break;
         case '#notes': showNotesScreen(); break;
@@ -140,50 +139,7 @@ function handleRouting() {
     }
 }
 
-// --- PWA Logic ---
-let deferredPrompt; 
-function initializePwaFeatures() {
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-    if (isStandalone) return; 
-
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        if(dom.pwaInstallBanner) dom.pwaInstallBanner.classList.remove('hidden');
-    });
-
-    if(dom.pwaInstallBtn) {
-        dom.pwaInstallBtn.addEventListener('click', () => {
-            if (isIOS) {
-                if(dom.modalBackdrop) dom.modalBackdrop.classList.remove('hidden');
-                const iosModal = document.getElementById('ios-install-modal');
-                if(iosModal) iosModal.classList.remove('hidden');
-            } else if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        if(dom.pwaInstallBanner) dom.pwaInstallBanner.classList.add('hidden');
-                    }
-                    deferredPrompt = null;
-                });
-            } else {
-                alert("To install, tap your browser menu and select 'Add to Home Screen' or 'Install App'.");
-            }
-        });
-    }
-    const iosCloseBtn = document.getElementById('ios-install-close-btn');
-    if(iosCloseBtn) {
-        iosCloseBtn.addEventListener('click', () => {
-            const iosModal = document.getElementById('ios-install-modal');
-            if(iosModal) iosModal.classList.add('hidden');
-            dom.modalBackdrop.classList.add('hidden');
-        });
-    }
-}
-
-// --- Daily Streak Logic ---
+// --- Daily Streak ---
 function calculateDailyStreak() {
     if (!dom.streakContainer || !dom.streakCount) return;
     const today = new Date().toISOString().split('T')[0];
@@ -206,57 +162,68 @@ function calculateDailyStreak() {
     dom.streakCount.textContent = streak;
     if (streak > 0) {
         dom.streakContainer.classList.remove('hidden');
-        dom.streakContainer.classList.add('flex'); // Ensure flex display
+        dom.streakContainer.classList.add('flex');
     }
 }
 
 // --- APP INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
+    
+    // 1. SETTINGS INITIALIZATION (FIXED)
     const toggleThemeBtn = document.getElementById('toggle-theme-btn');
     const toggleAnimationBtn = document.getElementById('toggle-animation-btn');
     const loginCanvas = document.getElementById('login-canvas');
     const htmlEl = document.documentElement;
 
-    window.addEventListener('hashchange', handleRouting);
-    initializePwaFeatures();
-    calculateDailyStreak(); 
-
     function initializeSettings() {
+        // Theme
         const savedTheme = localStorage.getItem('theme') || 'light';
-        htmlEl.className = savedTheme;
+        htmlEl.className = savedTheme; // Resets any other class
 
+        // Animation
         const savedAnimation = localStorage.getItem('animation') || 'on';
         if (savedAnimation === 'off') {
-            if(loginCanvas) loginCanvas.style.display = 'none';
             htmlEl.classList.add('animation-off');
+            if(loginCanvas) loginCanvas.style.display = 'none';
         } else {
-            if(loginCanvas) loginCanvas.style.display = 'block';
             htmlEl.classList.remove('animation-off');
+            if(loginCanvas) loginCanvas.style.display = 'block';
         }
     }
 
+    // Theme Button Logic
     safeListen(toggleThemeBtn, 'click', () => {
         if (htmlEl.classList.contains('light')) {
-            htmlEl.className = htmlEl.className.replace('light', 'dark');
+            htmlEl.classList.replace('light', 'dark');
             localStorage.setItem('theme', 'dark');
         } else {
-            htmlEl.className = htmlEl.className.replace('dark', 'light');
+            htmlEl.classList.replace('dark', 'light');
+            if (!htmlEl.classList.contains('light')) htmlEl.classList.add('light'); // Ensure light is present
+            htmlEl.classList.remove('dark');
             localStorage.setItem('theme', 'light');
         }
     });
 
+    // Animation Button Logic
     safeListen(toggleAnimationBtn, 'click', () => {
         if (htmlEl.classList.contains('animation-off')) {
             htmlEl.classList.remove('animation-off');
-            if(loginCanvas) loginCanvas.style.display = 'block';
             localStorage.setItem('animation', 'on');
+            if(loginCanvas) loginCanvas.style.display = 'block';
         } else {
             htmlEl.classList.add('animation-off');
-            if(loginCanvas) loginCanvas.style.display = 'none';
             localStorage.setItem('animation', 'off');
+            if(loginCanvas) loginCanvas.style.display = 'none';
         }
     });
 
+    initializeSettings(); // Run immediately
+
+    // 2. PWA & Routing
+    window.addEventListener('hashchange', handleRouting);
+    calculateDailyStreak(); 
+
+    // 3. Data Loading
     async function initializeApp() {
         if(dom.loginSubmitBtn) {
             dom.loginSubmitBtn.disabled = true;
@@ -276,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
             appState.allRoles = data.roles || [];
             appState.allTheoryQuestions = utils.parseTheoryQuestions(data.theoryQuestions);
 
-            populateAllFilters(); // Populate filters for BOTH Mock and Simulation
+            populateAllFilters();
             
             if(dom.loginSubmitBtn) {
                 dom.loginSubmitBtn.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Log In';
@@ -292,9 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    initializeSettings();
-
-    // --- EVENT LISTENERS (Connected to New UI) ---
+    // --- EVENT LISTENERS ---
     
     // Tour
     safeListen(dom.helpBtn, 'click', startTour);
@@ -310,7 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
     safeListen(dom.registerCancelBtn, 'click', hideRegistrationModal);
     safeListen(dom.logoutBtn, 'click', handleLogout);
     
-    // Navigation (Sidebar & Back Buttons)
+    // Navigation
     safeListen(dom.globalHomeBtn, 'click', () => {
         if (appState.currentUser?.Role === 'Guest') { ui.showScreen(dom.loginContainer); appState.currentUser = null; } 
         else { showMainMenuScreen(); }
@@ -320,13 +285,26 @@ document.addEventListener('DOMContentLoaded', () => {
         safeListen(btn, 'click', () => { if (window.history.length > 1) window.history.back(); else showMainMenuScreen(); });
     });
 
+    // Menu Buttons
     safeListen(dom.lecturesBtn, 'click', () => { if (checkPermission('Lectures')) { renderLectures(); ui.showScreen(dom.lecturesContainer); } });
     safeListen(dom.qbankBtn, 'click', () => { if (checkPermission('MCQBank')) { ui.showScreen(dom.qbankContainer); } });
     safeListen(dom.learningModeBtn, 'click', () => { if (checkPermission('LerningMode')) showLearningModeBrowseScreen(); });
     safeListen(dom.theoryBtn, 'click', () => { if (checkPermission('TheoryBank')) showTheoryMenuScreen(); });
     safeListen(dom.osceBtn, 'click', () => { if (checkPermission('OSCEBank')) { ui.showScreen(dom.osceContainer); } });
     safeListen(dom.libraryBtn, 'click', () => { if (checkPermission('Library')) { ui.renderBooks(); ui.showScreen(dom.libraryContainer); } });
-    safeListen(dom.studyPlannerBtn, 'click', () => { if (checkPermission('StudyPlanner')) showStudyPlannerScreen(); });
+    
+    // SAFE GUARDED PLANNER BUTTON (Prevents Crash)
+    safeListen(dom.studyPlannerBtn, 'click', async () => { 
+        if (checkPermission('StudyPlanner')) {
+            try { await showStudyPlannerScreen(); } 
+            catch (error) { 
+                console.error("Planner Error:", error); 
+                alert("Planner data error. Please clear browser cache/local storage.");
+                if(dom.studyPlannerLoader) dom.studyPlannerLoader.classList.add('hidden');
+            }
+        } 
+    });
+
     safeListen(dom.leaderboardBtn, 'click', () => checkPermission('LeadersBoard') && showLeaderboardScreen());
     safeListen(dom.matchingBtn, 'click', () => showMatchingMenu());
     safeListen(dom.freeTestBtn, 'click', startFreeTest);
@@ -362,8 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     safeListen(dom.noteCancelBtn, 'click', () => { dom.noteModal.classList.add('hidden'); dom.modalBackdrop.classList.add('hidden'); });
     
-    // --- QBank Logic ---
-    // Mock Exam
+    // QBank & Simulation
     safeListen(dom.startMockBtn, 'click', handleMockExamStart);
     safeListen(dom.toggleCustomOptionsBtn, 'click', () => dom.customExamOptions.classList.toggle('visible'));
     safeListen(dom.sourceSelectMock, 'change', updateChapterFilter);
@@ -375,7 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
         dom.chapterSelectMock.querySelectorAll('input[type="checkbox"]').forEach(checkbox => { checkbox.checked = e.target.checked; });
     });
 
-    // Simulation Mode (NEW FILTERS)
+    // Simulation Listeners
     safeListen(dom.startSimulationBtn, 'click', handleStartSimulation); 
     safeListen(dom.toggleSimulationOptionsBtn, 'click', () => dom.simulationCustomOptions.classList.toggle('hidden'));
     if(dom.selectAllSourcesSim) safeListen(dom.selectAllSourcesSim, 'change', (e) => {
@@ -385,7 +362,6 @@ document.addEventListener('DOMContentLoaded', () => {
         dom.chapterSelectSim.querySelectorAll('input[type="checkbox"]').forEach(checkbox => { checkbox.checked = e.target.checked; });
     });
 
-    // Search & Practice
     safeListen(dom.qbankSearchBtn, 'click', handleQBankSearch);
     safeListen(dom.qbankStartSearchQuizBtn, 'click', startSearchedQuiz);
     safeListen(dom.qbankClearSearchBtn, 'click', () => {
@@ -398,7 +374,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if(dom.browseByChapterBtn) safeListen(dom.browseByChapterBtn, 'click', () => startQuizBrowse('chapter'));
     if(dom.browseBySourceBtn) safeListen(dom.browseBySourceBtn, 'click', () => startQuizBrowse('source'));
     
-    // Tabs
     const qbankTabs = [dom.qbankTabCreate, dom.qbankTabPractice, dom.qbankTabBrowse];
     qbankTabs.forEach((tab, index) => { 
         safeListen(tab, 'click', () => {
@@ -410,7 +385,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }); 
     });
 
-    // Quiz Controls
     safeListen(dom.endQuizBtn, 'click', triggerEndQuiz);
     safeListen(dom.nextSkipBtn, 'click', handleNextQuestion);
     safeListen(dom.previousBtn, 'click', handlePreviousQuestion);
@@ -427,14 +401,13 @@ document.addEventListener('DOMContentLoaded', () => {
     safeListen(dom.reviewIncorrectBtn, 'click', () => reviewIncorrectAnswers());
     safeListen(document.getElementById('review-simulation-btn'), 'click', () => startSimulationReview());
 
-    // --- Matching Logic ---
+    // Matching
     safeListen(dom.startMatchingBtn, 'click', handleStartMatchingExam);
     safeListen(dom.matchingSubmitBtn, 'click', () => checkCurrentSetAnswers());
     safeListen(dom.matchingNextBtn, 'click', handleNextMatchingSet);
     safeListen(dom.endMatchingBtn, 'click', () => { ui.showConfirmationModal('End Test', 'Are you sure?', () => showMatchingMenu()); });
 
-    // --- OSCE & Learning Mode & Planner & Modals ---
-    // (All connected exactly as before)
+    // OSCE & Others
     safeListen(dom.startOsceSlayerBtn, 'click', startOsceSlayer);
     safeListen(dom.startCustomOsceBtn, 'click', startCustomOsce);
     safeListen(dom.toggleOsceOptionsBtn, 'click', () => dom.customOsceOptions.classList.toggle('visible'));
