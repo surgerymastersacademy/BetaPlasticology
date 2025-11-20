@@ -1,23 +1,17 @@
-/* style.css (FINAL VERSION - Dashboard UI) */
+/* style.css (نسخة الإصلاح الشامل - FIXED VERSION) */
 
-/* --- 1. Global Variables & Reset --- */
+/* 1. إعدادات أساسية وإصلاح الألوان */
 :root {
-    --primary-color: #2563eb; /* blue-600 */
-    --secondary-color: #475569; /* slate-600 */
-    --bg-color: #f1f5f9; /* slate-100 */
-    --card-bg: #ffffff;
-    --text-main: #1e293b; /* slate-800 */
-    --sidebar-width: 280px;
-    --header-height: 64px;
-    --bottom-nav-height: 64px;
+    --primary-color: #2563eb; /* أزرق */
+    --bg-color: #f1f5f9;      /* خلفية فاتحة */
+    --card-bg: #ffffff;       /* لون الكروت أبيض */
+    --text-main: #1e293b;     /* لون النص غامق */
+    --sidebar-bg: #0f172a;    /* لون القائمة الجانبية */
+    --sidebar-width: 260px;
 }
 
-/* Dark Mode Variables */
-html.dark {
-    --bg-color: #0f172a; /* slate-900 */
-    --card-bg: #1e293b; /* slate-800 */
-    --text-main: #f8fafc; /* slate-50 */
-    --secondary-color: #94a3b8; /* slate-400 */
+* {
+    box-sizing: border-box; /* عشان المقاسات تظبط */
 }
 
 body {
@@ -27,205 +21,131 @@ body {
     margin: 0;
     padding: 0;
     height: 100vh;
-    overflow: hidden; /* Prevent double scrollbars */
+    overflow: hidden; /* منع السكرول المزدوج */
 }
 
-/* Loader Style */
-.loader {
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid var(--primary-color);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-    margin: 20px auto;
-}
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-/* --- 2. Login Screen (Isolated) --- */
-#login-wrapper {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-    overflow-y: auto;
-}
-
-.login-card {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    transition: transform 0.3s ease;
-}
-
-html.dark .login-card {
-    background: rgba(30, 41, 59, 0.95);
-    color: white;
-}
-
-/* --- 3. Dashboard Layout --- */
+/* 2. إجبار القائمة الجانبية على الظهور (Dashboard Fix) */
 #app-layout {
-    display: flex;
+    display: flex !important;
     height: 100vh;
     width: 100vw;
-    overflow: hidden;
 }
 
-/* Sidebar (Desktop) */
 #sidebar {
     width: var(--sidebar-width);
-    background-color: #1e293b; /* slate-800 */
+    background-color: var(--sidebar-bg);
     color: white;
     display: flex;
     flex-direction: column;
-    transition: transform 0.3s ease;
-    z-index: 50;
+    height: 100%;
+    position: relative;
+    z-index: 100;
+    flex-shrink: 0; /* منع القائمة من الانكماش */
 }
 
+/* إخفاء القائمة في الموبايل وإظهارها في الكمبيوتر */
+@media (max-width: 768px) {
+    #sidebar { display: none !important; }
+    #bottom-nav { display: flex !important; }
+    #main-content { padding-bottom: 80px; } /* مسافة للقائمة السفلية */
+}
+
+@media (min-width: 769px) {
+    #sidebar { display: flex !important; }
+    #bottom-nav { display: none !important; }
+}
+
+/* تنسيق أزرار القائمة الجانبية */
 .sidebar-link {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    margin: 4px 12px;
+    gap: 15px;
+    padding: 15px 20px;
+    margin: 5px 10px;
     border-radius: 8px;
-    color: #cbd5e1; /* slate-300 */
-    transition: all 0.2s;
+    color: #cbd5e1;
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
     font-weight: 500;
+    width: auto;
+    text-align: left;
 }
 
 .sidebar-link:hover, .sidebar-link.active {
-    background-color: #334155; /* slate-700 */
+    background-color: #334155;
     color: white;
-    transform: translateX(4px);
 }
 
-.sidebar-link i {
-    width: 24px;
-    text-align: center;
-}
-
-/* Custom Scrollbar for Sidebar */
-.custom-scrollbar::-webkit-scrollbar { width: 6px; }
-.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-.custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
-
-/* Main Content Area */
+/* 3. إصلاح المحتوى الرئيسي (Home & Cards) */
 #main-content {
     flex: 1;
     background-color: var(--bg-color);
     overflow-y: auto;
-    padding-bottom: 100px; /* Space for bottom nav on mobile */
+    padding: 20px;
     position: relative;
-    scroll-behavior: smooth;
 }
 
-/* Desktop tweaks */
-@media (min-width: 768px) {
-    #main-content {
-        padding-bottom: 20px;
-    }
-}
-
-/* --- 4. Modern Cards & UI Elements --- */
+/* تنسيق الكروت (Dashboard Cards) عشان الكلام مايلزقش */
 .dashboard-card {
     background: var(--card-bg);
-    border-radius: 16px;
+    border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    cursor: pointer;
+    margin: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border: 1px solid #e2e8f0;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 140px;
-    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s;
 }
 
-html.dark .dashboard-card {
-    border-color: #334155;
-    background: #1e293b;
-}
-
-.dashboard-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-.action-btn {
-    transition: all 0.2s;
-}
-.action-btn:active {
-    transform: scale(0.95);
-}
-
-/* --- 5. Bottom Navigation (Mobile) --- */
-#bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: var(--bottom-nav-height);
-    background: var(--card-bg);
-    border-top: 1px solid #e2e8f0;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    z-index: 40;
-    box-shadow: 0 -4px 6px -1px rgba(0,0,0,0.05);
-}
-
-html.dark #bottom-nav {
-    border-color: #334155;
-}
-
-#bottom-nav button {
-    color: var(--secondary-color);
-    transition: color 0.2s;
-    background: none;
-    border: none;
-    flex: 1;
-    height: 100%;
-}
-
-#bottom-nav button.active-nav-link,
-#bottom-nav button:focus {
+.dashboard-card i {
+    font-size: 24px;
+    margin-bottom: 10px;
     color: var(--primary-color);
 }
 
-@media (min-width: 768px) {
-    #bottom-nav {
-        display: none;
-    }
+.dashboard-card span {
+    font-weight: bold;
+    color: var(--text-main);
 }
 
-/* --- 6. Quiz Interface Styling --- */
-#quiz-container {
-    background: var(--bg-color);
+/* 4. إصلاح أزرار الوظائف والأسئلة (Buttons & Questions) */
+.action-btn, .answer-btn, button {
+    cursor: pointer;
 }
 
+/* أزرار الإجابات - عشان تكون واضحة */
 .answer-btn {
+    display: block;
     width: 100%;
     text-align: left;
-    padding: 16px;
-    margin-bottom: 12px;
-    background: var(--card-bg);
-    border: 2px solid transparent;
-    border-radius: 12px;
-    transition: all 0.2s;
-    font-weight: 500;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    padding: 15px; /* مسافة داخلية عشان الكلام يرتاح */
+    margin-bottom: 10px; /* مسافة بين الأزرار */
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    color: #334155;
+    font-size: 16px;
+    font-weight: 600;
 }
 
 .answer-btn:hover {
-    border-color: #cbd5e1;
-    background: #f8fafc;
+    background-color: #f1f5f9;
+    border-color: #94a3b8;
 }
 
+/* تمييز الإجابة المختارة */
 .answer-btn.selected {
+    background-color: #e0e7ff;
     border-color: var(--primary-color);
-    background: #eff6ff;
+    color: var(--primary-color);
 }
 
 .answer-btn.correct {
@@ -240,65 +160,58 @@ html.dark #bottom-nav {
     color: #7f1d1d;
 }
 
-/* --- 7. Utility Classes for Visibility Control --- */
-/* These classes are crucial for the JavaScript to show/hide screens */
+/* زرار الـ Home والـ Header */
+#global-header {
+    background: white;
+    padding: 10px 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 60px;
+}
+
+/* 5. إصلاح القائمة السفلية للموبايل (Bottom Nav) */
+#bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background: white;
+    border-top: 1px solid #ddd;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 999;
+}
+
+#bottom-nav button {
+    background: none;
+    border: none;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    padding: 5px;
+}
+
+#bottom-nav button.active-nav-link {
+    color: var(--primary-color);
+}
+
+/* أدوات المساعدة (Utility) */
 .hidden {
     display: none !important;
 }
 
-/* Settings Button (Floating) */
-#settings-container {
-    position: fixed;
-    top: 16px;
-    right: 16px;
-    z-index: 200;
-    background: rgba(255,255,255,0.8);
-    backdrop-filter: blur(4px);
-    border-radius: 20px;
-    padding: 4px;
-    display: flex;
-    gap: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-/* --- 8. Input Fields with Icons --- */
-.input-with-icon-container {
-    position: relative;
-}
-.input-with-icon-container i {
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #94a3b8;
-}
-.input-with-icon {
-    padding-left: 44px !important;
-}
-
-/* --- 9. Matching Game Specifics --- */
-.premise-card, .answer-draggable {
-    background: var(--card-bg);
-    padding: 16px;
+/* إصلاح حقول الإدخال عشان الكلام يكون واضح */
+input, select {
+    padding: 12px;
+    border: 1px solid #cbd5e1;
     border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    margin-bottom: 8px;
-}
-.premise-drop-zone {
-    border: 2px dashed #cbd5e1;
-    border-radius: 8px;
-    min-height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 8px;
-    background: rgba(255,255,255,0.5);
-}
-.premise-drop-zone.correct-match {
-    border-color: #22c55e;
-    background: #dcfce7;
-}
-.premise-drop-zone.incorrect-match {
-    border-color: #ef4444;
-    background: #fee2e2;
+    width: 100%;
+    margin-bottom: 10px;
 }
