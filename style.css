@@ -1,17 +1,28 @@
-/* style.css (نسخة الإصلاح الشامل - FIXED VERSION) */
+/* style.css (FINAL FULL VERSION - INCLUDES DARK MODE & ANIMATION) */
 
-/* 1. إعدادات أساسية وإصلاح الألوان */
+/* --- 1. Global Variables & Reset --- */
 :root {
-    --primary-color: #2563eb; /* أزرق */
-    --bg-color: #f1f5f9;      /* خلفية فاتحة */
-    --card-bg: #ffffff;       /* لون الكروت أبيض */
-    --text-main: #1e293b;     /* لون النص غامق */
-    --sidebar-bg: #0f172a;    /* لون القائمة الجانبية */
+    --primary-color: #2563eb; /* blue-600 */
+    --bg-color: #f1f5f9;      /* slate-100 */
+    --card-bg: #ffffff;
+    --text-main: #1e293b;     /* slate-800 */
+    --sidebar-bg: #0f172a;    /* slate-900 */
     --sidebar-width: 260px;
+    --border-color: #e2e8f0;
+}
+
+/* قواعد الألوان للوضع الليلي (Dark Mode) */
+html.dark {
+    --bg-color: #0f172a;       /* خلفية زرقاء غامقة جداً */
+    --card-bg: #1e293b;        /* لون الكروت رمادي غامق */
+    --text-main: #f1f5f9;      /* لون النص أبيض */
+    --primary-color: #60a5fa;  /* أزرق فاتح للأزرار */
+    --sidebar-bg: #020617;
+    --border-color: #334155;
 }
 
 * {
-    box-sizing: border-box; /* عشان المقاسات تظبط */
+    box-sizing: border-box;
 }
 
 body {
@@ -22,15 +33,52 @@ body {
     padding: 0;
     height: 100vh;
     overflow: hidden; /* منع السكرول المزدوج */
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* 2. إجبار القائمة الجانبية على الظهور (Dashboard Fix) */
+/* Loader Style */
+.loader {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* --- 2. Login Screen (Isolated) --- */
+#login-wrapper {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    overflow-y: auto;
+}
+
+.login-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease;
+    border-radius: 16px;
+}
+
+html.dark .login-card {
+    background: rgba(30, 41, 59, 0.95);
+    color: white;
+    border: 1px solid var(--border-color);
+}
+
+/* --- 3. Dashboard Layout --- */
 #app-layout {
     display: flex !important;
     height: 100vh;
     width: 100vw;
+    overflow: hidden;
 }
 
+/* Sidebar (Desktop) */
 #sidebar {
     width: var(--sidebar-width);
     background-color: var(--sidebar-bg);
@@ -40,14 +88,15 @@ body {
     height: 100%;
     position: relative;
     z-index: 100;
-    flex-shrink: 0; /* منع القائمة من الانكماش */
+    flex-shrink: 0;
+    border-right: 1px solid rgba(255,255,255,0.1);
 }
 
 /* إخفاء القائمة في الموبايل وإظهارها في الكمبيوتر */
 @media (max-width: 768px) {
     #sidebar { display: none !important; }
     #bottom-nav { display: flex !important; }
-    #main-content { padding-bottom: 80px; } /* مسافة للقائمة السفلية */
+    #main-content { padding-bottom: 80px; }
 }
 
 @media (min-width: 769px) {
@@ -63,39 +112,45 @@ body {
     padding: 15px 20px;
     margin: 5px 10px;
     border-radius: 8px;
-    color: #cbd5e1;
+    color: #94a3b8;
     text-decoration: none;
     background: transparent;
     border: none;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 500;
     width: auto;
     text-align: left;
+    transition: all 0.2s;
 }
 
 .sidebar-link:hover, .sidebar-link.active {
-    background-color: #334155;
+    background-color: rgba(255, 255, 255, 0.1);
     color: white;
 }
 
-/* 3. إصلاح المحتوى الرئيسي (Home & Cards) */
+html.dark .sidebar-link:hover {
+    background-color: #334155;
+}
+
+/* --- 4. Main Content Area --- */
 #main-content {
     flex: 1;
     background-color: var(--bg-color);
     overflow-y: auto;
     padding: 20px;
     position: relative;
+    scroll-behavior: smooth;
 }
 
-/* تنسيق الكروت (Dashboard Cards) عشان الكلام مايلزقش */
+/* تنسيق الكروت (Dashboard Cards) */
 .dashboard-card {
     background: var(--card-bg);
     border-radius: 12px;
     padding: 20px;
-    margin: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    border: 1px solid #e2e8f0;
+    margin: 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -103,6 +158,12 @@ body {
     height: 140px;
     cursor: pointer;
     transition: transform 0.2s;
+    text-align: center;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 .dashboard-card i {
@@ -116,70 +177,92 @@ body {
     color: var(--text-main);
 }
 
-/* 4. إصلاح أزرار الوظائف والأسئلة (Buttons & Questions) */
-.action-btn, .answer-btn, button {
-    cursor: pointer;
-}
-
-/* أزرار الإجابات - عشان تكون واضحة */
-.answer-btn {
-    display: block;
-    width: 100%;
-    text-align: left;
-    padding: 15px; /* مسافة داخلية عشان الكلام يرتاح */
-    margin-bottom: 10px; /* مسافة بين الأزرار */
-    background: #ffffff;
-    border: 2px solid #e2e8f0;
-    border-radius: 10px;
-    color: #334155;
-    font-size: 16px;
-    font-weight: 600;
-}
-
-.answer-btn:hover {
-    background-color: #f1f5f9;
-    border-color: #94a3b8;
-}
-
-/* تمييز الإجابة المختارة */
-.answer-btn.selected {
-    background-color: #e0e7ff;
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-}
-
-.answer-btn.correct {
-    background-color: #dcfce7 !important;
-    border-color: #22c55e !important;
-    color: #14532d;
-}
-
-.answer-btn.incorrect {
-    background-color: #fee2e2 !important;
-    border-color: #ef4444 !important;
-    color: #7f1d1d;
-}
-
-/* زرار الـ Home والـ Header */
+/* --- 5. Global Header --- */
 #global-header {
-    background: white;
+    background: var(--card-bg);
     padding: 10px 20px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     display: flex;
     justify-content: space-between;
     align-items: center;
     min-height: 60px;
+    border-bottom: 1px solid var(--border-color);
 }
 
-/* 5. إصلاح القائمة السفلية للموبايل (Bottom Nav) */
+/* --- 6. Buttons & Inputs --- */
+.action-btn, .answer-btn, button {
+    cursor: pointer;
+    font-family: inherit;
+}
+
+/* أزرار الإجابات */
+.answer-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 16px;
+    margin-bottom: 12px;
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--text-main);
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.answer-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-color: #94a3b8;
+}
+
+html.dark .answer-btn:hover {
+    background-color: #334155;
+}
+
+.answer-btn.selected {
+    background-color: #e0e7ff;
+    border-color: var(--primary-color);
+    color: #1d4ed8; /* Always blue text for selected state in light */
+}
+
+html.dark .answer-btn.selected {
+    background-color: #1e3a8a;
+    color: white;
+    border-color: #60a5fa;
+}
+
+.answer-btn.correct {
+    background-color: #dcfce7 !important;
+    border-color: #22c55e !important;
+    color: #14532d !important;
+}
+
+.answer-btn.incorrect {
+    background-color: #fee2e2 !important;
+    border-color: #ef4444 !important;
+    color: #7f1d1d !important;
+}
+
+input, select, textarea {
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    width: 100%;
+    margin-bottom: 10px;
+    background-color: var(--card-bg);
+    color: var(--text-main);
+}
+
+/* --- 7. Bottom Navigation (Mobile) --- */
 #bottom-nav {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
     height: 70px;
-    background: white;
-    border-top: 1px solid #ddd;
+    background: var(--card-bg);
+    border-top: 1px solid var(--border-color);
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -202,16 +285,100 @@ body {
     color: var(--primary-color);
 }
 
-/* أدوات المساعدة (Utility) */
-.hidden {
-    display: none !important;
+/* --- 8. Settings & Toggles --- */
+#settings-container {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 200;
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(4px);
+    border-radius: 20px;
+    padding: 4px;
+    display: flex;
+    gap: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-/* إصلاح حقول الإدخال عشان الكلام يكون واضح */
-input, select {
-    padding: 12px;
-    border: 1px solid #cbd5e1;
+html.dark #settings-container {
+    background: rgba(30, 41, 59, 0.8);
+}
+
+#settings-container button {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    color: var(--text-main);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+#settings-container button:hover {
+    background-color: rgba(128, 128, 128, 0.2);
+}
+
+/* تبديل الأيقونات (الشمس والقمر) */
+html.light .sun-icon { display: none !important; }
+html.light .moon-icon { display: block !important; }
+html.dark .sun-icon { display: block !important; }
+html.dark .moon-icon { display: none !important; }
+
+/* تبديل أيقونات الحركة */
+html:not(.animation-off) .animation-off-icon { display: none !important; }
+html:not(.animation-off) .animation-on-icon { display: block !important; }
+html.animation-off .animation-on-icon { display: none !important; }
+html.animation-off .animation-off-icon { display: block !important; }
+
+/* تعطيل الحركة */
+html.animation-off *,
+html.animation-off *::before,
+html.animation-off *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+}
+
+/* --- 9. Utilities --- */
+.hidden { display: none !important; }
+
+.input-with-icon-container { position: relative; }
+.input-with-icon-container i {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+}
+.input-with-icon { padding-left: 44px !important; }
+
+/* Matching Game */
+.premise-card, .answer-draggable {
+    background: var(--card-bg);
+    padding: 16px;
     border-radius: 8px;
-    width: 100%;
-    margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 8px;
+    border: 1px solid var(--border-color);
+}
+.premise-drop-zone {
+    border: 2px dashed #cbd5e1;
+    border-radius: 8px;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 8px;
+    background: rgba(128,128,128,0.1);
+}
+.premise-drop-zone.correct-match {
+    border-color: #22c55e;
+    background: rgba(34, 197, 94, 0.2);
+}
+.premise-drop-zone.incorrect-match {
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.2);
 }
